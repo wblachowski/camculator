@@ -13,8 +13,8 @@ from main import convert
 
 import cv2
 
-labels_dict = {'0': 0, '1':1, '2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'dot':10,'minus':11,'plus':12,'w':13,'x':14,'y':15,'z':16}
-class_labels = {0:'0',1:'1',2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'dot',11:'minus',12:'plus',13:'w',14:'x',15:'y',16:'z'}
+labels_dict = {'0': 0, '1':1, '2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'dot':10,'minus':11,'plus':12,'w':13,'x':14,'y':15,'z':16,'slash':17}
+class_labels = {0:'0',1:'1',2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'dot',11:'minus',12:'plus',13:'w',14:'x',15:'y',16:'z',17:'slash'}
 
 
 def convert2(filename):
@@ -28,11 +28,11 @@ def convert2(filename):
 
 
 if __name__ == '__main__':
-    model = keras.models.load_model('swilk1.h5')
-    files_names = files('final')
+    model = keras.models.load_model('Sieci\\with_slash1.h5')
+    files_names = files('swilk-data')
     error = {}
     for filename in files_names:
-        image = convert2('final'+'\\'+filename)
+        image = convert2('swilk-data'+'\\'+filename)
         corr_label = labels_dict[filename[0:filename.index('-')]]
         y_prob = model.predict(image)
         y_class = y_prob.argmax(axis=-1)
