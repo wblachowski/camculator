@@ -7,7 +7,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 batch_size = 128
-num_classes = 17
+num_classes = 18
 epochs = 30
 import keras
 from keras.datasets import mnist
@@ -28,7 +28,7 @@ def files(mypath):
     return onlyfiles
 
 
-labels_dict = {'0': 0, '1':1, '2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'dot':10,'minus':11,'plus':12,'w':13,'x':14,'y':15,'z':16}
+labels_dict = {'0': 0, '1':1, '2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'dot':10,'minus':11,'plus':12,'w':13,'x':14,'y':15,'z':16,'slash':17}
 
 
 def labels_file_names(files):
@@ -73,7 +73,7 @@ def get_model():
     model.add(Activation('relu'))
     BatchNormalization()
     model.add(Dropout(0.2))
-    model.add(Dense(17))
+    model.add(Dense(18))
     model.add(Activation('softmax'))
     model.compile(loss=keras.losses.categorical_crossentropy,
                   optimizer=keras.optimizers.Adam(),
@@ -103,4 +103,4 @@ if __name__ == '__main__':
 
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
-    model.save('Sieci\\swilk2.h5')
+    model.save('Sieci\\with_slash1.h5')

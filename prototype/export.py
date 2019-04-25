@@ -8,11 +8,11 @@ import os.path as osp
 import tensorflow as tf
 import os
 
-model_name = 'tempneu.h5'
+model_name = 'Sieci\\with_slash1.h5'
 saved_model_path = 'exported'
 
 model = load_model(model_name)
-nb_classes = 17 # The number of output nodes in the model
+nb_classes = 18 # The number of output nodes in the model
 prefix_output_node_names_of_final_network = 'output_node'
 
 K.set_learning_phase(0)
