@@ -29,10 +29,10 @@ def convert2(filename):
 
 if __name__ == '__main__':
     model = keras.models.load_model('Sieci\\with_slash1.h5')
-    files_names = files('swilk-data')
+    files_names = files('data/symbols')
     error = {}
     for filename in files_names:
-        image = convert2('swilk-data'+'\\'+filename)
+        image = convert2('data/symbols'+'\\'+filename)
         corr_label = labels_dict[filename[0:filename.index('-')]]
         y_prob = model.predict(image)
         y_class = y_prob.argmax(axis=-1)

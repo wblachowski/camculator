@@ -81,7 +81,7 @@ def get_model():
     return model
 
 if __name__ == '__main__':
-    path = 'swilk-data'
+    path = 'data/symbols'
     files_names = files(path)
     labels = labels_file_names(files_names)
     labels = keras.utils.to_categorical(labels, num_classes)

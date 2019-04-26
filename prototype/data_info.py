@@ -25,7 +25,7 @@ def labels_file_names(files):
 
 
 
-labels = files('swilk-data')
+labels = files('data/symbols')
 labels = labels_file_names(labels)
 d = {}
 for l in labels:
