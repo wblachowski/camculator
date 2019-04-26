@@ -5,7 +5,7 @@ import cv2
 import extraction
 from classifier import Classifier
 
-DEFAULT_MANY_PATH = "./equations"
+DEFAULT_MANY_PATH = "./data/equations"
 SPECIAL_SYMBOLS_MAP = {"plus": "+", "minus": "-", "dot": "*", "slash": "/"}
 
 
