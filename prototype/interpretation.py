@@ -4,12 +4,12 @@ import numpy as np
 SPECIAL_SYMBOLS_MAP = {"plus": "+", "minus": "-", "dot": "*", "slash": "/"}
 
 
-def get_expressions(data, classifier):
+def get_expressions(data, classifier, createImage=False):
     boxes_mask = get_boxes_mask(data.img_org.shape, data.symbols)
     equations = get_equations(data.img_org.shape, data.symbols, boxes_mask)
 
     expressions = []
-    img_predictions = data.img_org.copy()
+    img_predictions = data.img_org.copy() if createImage else np.empty(data.img_org.shape)
     for equation in equations:
         predictions = []
         boxes = []
@@ -18,8 +18,9 @@ def get_expressions(data, classifier):
             predictions.append(prediction)
             boxes.append(box)
             x, y, w, h = box
-            cv2.rectangle(img_predictions, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.putText(img_predictions, prediction, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+            if createImage:
+                cv2.rectangle(img_predictions, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.putText(img_predictions, prediction, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
 
         expression = ''
         i = 0
@@ -38,11 +39,10 @@ def get_expressions(data, classifier):
 
 
 def get_boxes_mask(shape, symbols):
-    boxes_mask = np.zeros(shape, np.uint8)
+    boxes_mask = np.zeros((shape[0], shape[1]), np.uint8)
     for box, symbol in symbols:
         x, y, w, h = box
-        cv2.rectangle(boxes_mask, (x, y), (x + w, y + h), (255, 255, 255), cv2.FILLED)
-    boxes_mask = cv2.cvtColor(boxes_mask, cv2.COLOR_BGR2GRAY)
+        boxes_mask[y:y + h, x:x + w] = 255
     return boxes_mask
 
 
