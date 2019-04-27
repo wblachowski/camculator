@@ -67,13 +67,6 @@ def process_img(org_img, display=False):
     img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block_size, 5)
     if display:
         display_plot(img, 'With binary threshold applied', 'gray')
-
-    # Morphological opening
-    kernel_size = max(img_height, img_width) // 100
-    img = cv2.morphologyEx(img, cv2.MORPH_OPEN,
-                           cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_size, kernel_size)))
-    if display:
-        display_plot(img, 'With Morphological opening', 'gray')
     img_binary = img.copy()
 
     # Find contours
