@@ -103,4 +103,4 @@ if __name__ == '__main__':
 
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
-    model.save('Sieci\\with_slash1.h5')
+    model.save('models\\model.h5')

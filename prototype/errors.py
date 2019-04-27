@@ -28,7 +28,7 @@ def convert2(filename):
 
 
 if __name__ == '__main__':
-    model = keras.models.load_model('Sieci\\with_slash1.h5')
+    model = keras.models.load_model('models\\model.h5')
     files_names = files('data/symbols')
     error = {}
     for filename in files_names:

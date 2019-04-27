@@ -8,7 +8,7 @@ import os.path as osp
 import tensorflow as tf
 import os
 
-model_name = 'Sieci\\with_slash1.h5'
+model_name = 'models\\model.h5'
 saved_model_path = 'exported'
 
 model = load_model(model_name)

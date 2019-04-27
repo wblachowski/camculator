@@ -6,7 +6,7 @@ import interpretation
 from classifier import Classifier
 
 DEFAULT_MANY_PATH = './data/equations'
-DEFAULT_MODEL_MATH = 'Sieci/with_slash1.h5'
+DEFAULT_MODEL_MATH = 'models/model.h5'
 
 parser = argparse.ArgumentParser(description='Test equations recognition')
 parser.add_argument('-s', '--source', nargs='?', default=DEFAULT_MANY_PATH,
