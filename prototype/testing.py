@@ -1,6 +1,5 @@
 import os
 import argparse
-import sympy
 from sympy.abc import x, y, w, z
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import solve, Eq
@@ -22,9 +21,21 @@ parser.add_argument('-d', '--display', action='store_true',
 
 
 def test_many(directory, display):
+    correct_map = get_correct_map(directory)
+    correct = 0
+    count = 0
     for file in os.listdir(directory):
-        file = f'{directory}/{file}'
-        test(file, display)
+        if file.endswith('.txt'):
+            continue
+        file_fullpath = f'{directory}/{file}'
+        expressions = test(file_fullpath, display)
+        count += 1
+        if expressions == correct_map[file]:
+            correct += 1
+        else:
+            print(f'Recognized {" ".join(expressions)}')
+            print(f'Expected {" ".join(correct_map[file])}')
+    print(f'Correctly recognized: {100*correct / count}%')
 
 
 def test(file, display):
@@ -42,13 +53,23 @@ def test(file, display):
     except:
         result = 'Unknown'
     print("Result:", result)
-    print("=======")
 
     if display:
         plt.title(
             f'Found {len(expressions)} equation(s) in {file}:\n' + '\n'.join(expressions) + f'\n\nResult:{result}')
         plt.imshow(img_predictions, cmap='gray')
         plt.show()
+    return expressions
+
+
+def get_correct_map(directory):
+    map = {}
+    correct_file = f'{directory}/correct.txt'
+    lines = [line.rstrip('\n') for line in open(correct_file)]
+    for line in lines:
+        parts = line.split(' ')
+        map[parts[0]] = parts[1].split(',')
+    return map
 
 
 if __name__ == "__main__":
