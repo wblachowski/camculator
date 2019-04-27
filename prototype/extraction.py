@@ -3,6 +3,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
+MAX_IMG_DIMENSION=800
 
 class data:
     def __init__(self, img_org, img_binary, img_boxes, boxes, symbols):
@@ -15,10 +16,16 @@ class data:
 
 def extract(filename, display=False):
     img_org = cv2.imread(filename)
+    img_org = scale_down_if_needed(img_org)
     img_boxes, img_binary, boxes = process_img(img_org, display)
     symbols = extract_symbols(img_binary, boxes)
     return data(img_org, img_binary, img_boxes, boxes, symbols)
 
+def scale_down_if_needed(img):
+    scale_factor = max(img.shape[0],img.shape[1])/800
+    if scale_factor>1.:
+        img = cv2.resize(img,(int(img.shape[1]/scale_factor),int(img.shape[0]//scale_factor)))
+    return img
 
 def extract_symbols(img, boxes, size=28):
     symbols = []
