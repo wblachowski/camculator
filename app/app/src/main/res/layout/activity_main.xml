@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <FrameLayout
+        android:id="@+id/camera_preview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        />
+    <FrameLayout
+        android:layout_width="700px"
+        android:layout_height="500px"
+        android:layout_gravity="top|right"
+        android:layout_marginTop="100px"
+        android:layout_marginRight="200px"
+        android:background="@drawable/border"></FrameLayout>
+    <ImageView
+        android:id="@+id/frame_preview"
+        android:layout_width="700px"
+        android:layout_height="500px"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="100px"
+        android:layout_marginRight="200px"
+        android:background="@drawable/border">
+    </ImageView>
+</FrameLayout>
