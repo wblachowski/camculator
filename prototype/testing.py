@@ -1,5 +1,9 @@
 import os
 import argparse
+import sympy
+from sympy.abc import x, y, w, z
+from sympy.parsing.sympy_parser import parse_expr
+from sympy import solve, Eq
 import matplotlib.pyplot as plt
 import extraction
 import interpretation
@@ -26,11 +30,23 @@ def test_many(directory, display):
 def test(file, display):
     data = extraction.extract(file)
     expressions, img_predictions = interpretation.get_expressions(data, classifier, createImage=display)
+
     print("=======")
     print(*expressions)
+    try:
+        sympy_equations = []
+        for expression in expressions:
+            parts = expression.split('=')
+            sympy_equations.append(Eq(parse_expr(parts[0]), parse_expr(parts[1])))
+        result = solve(sympy_equations, x, y, w, z)
+    except:
+        result = 'Unknown'
+    print("Result:", result)
     print("=======")
+
     if display:
-        plt.title(f'Found {len(expressions)} equation(s) in {file}:\n' + '\n'.join(expressions))
+        plt.title(
+            f'Found {len(expressions)} equation(s) in {file}:\n' + '\n'.join(expressions) + f'\n\nResult:{result}')
         plt.imshow(img_predictions, cmap='gray')
         plt.show()
 

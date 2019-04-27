@@ -30,7 +30,7 @@ def get_expressions(data, classifier, createImage=False):
                 expression += "="
                 i += 1
             elif i > 0 and is_power(boxes[i - 1], boxes[i]):
-                expression += '^' + SPECIAL_SYMBOLS_MAP.get(predictions[i], predictions[i])
+                expression += '**' + SPECIAL_SYMBOLS_MAP.get(predictions[i], predictions[i])
             else:
                 expression += SPECIAL_SYMBOLS_MAP.get(predictions[i], predictions[i])
             i += 1
