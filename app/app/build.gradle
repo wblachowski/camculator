@@ -31,5 +31,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.github.tbruyelle:rxpermissions:0.10.1'
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
-    compile group: 'org.opencv', name: 'opencv-android', version: '1.0.1'
+    implementation project(':openCVLibrary343')
 }

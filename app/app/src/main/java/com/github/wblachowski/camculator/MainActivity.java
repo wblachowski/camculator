@@ -18,15 +18,10 @@ import android.widget.ImageView;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
-import org.deeplearning4j.nn.modelimport.keras.exceptions.InvalidKerasConfigurationException;
-import org.deeplearning4j.nn.modelimport.keras.exceptions.UnsupportedKerasConfigurationException;
-import org.opencv.osgi.OpenCVNativeLoader;
+import org.opencv.android.OpenCVLoader;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     private FrameLayout cropPreview;
     private Rect cropRectangle = new Rect();
     private ImageProcessor imageProcessor = new ImageProcessor();
-    private EquationInterpreter equationInterpreter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,23 +42,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         askForCameraPermission();
-        File file = new File(this.getFilesDir() + File.separator + "model.pb");
-        try {
-            InputStream inputStream = getResources().openRawResource(R.raw.model);
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-
-            byte buf[] = new byte[1024];
-            int len;
-            while ((len = inputStream.read(buf)) > 0) {
-                fileOutputStream.write(buf, 0, len);
-            }
-
-            fileOutputStream.close();
-            inputStream.close();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        equationInterpreter = new EquationInterpreter(file);
 
         //TODO handle unavailable camera
         boolean access = checkCameraHardware(getApplicationContext());
@@ -87,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onPreviewFrame(byte[] data, Camera camera) {
-        if (imageProcessor.isProcessing()) {
+        if(imageProcessor.isProcessing()){
             return;
         }
         Camera.Parameters parameters = camera.getParameters();
@@ -100,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         Matrix matrix = new Matrix();
         matrix.postRotate(90);
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-        new ImageProcessingTask().execute(imageProcessor, equationInterpreter, bitmap, framePreview);
+        new ImageProcessingTask().execute(imageProcessor, bitmap, framePreview);
         try {
             out.flush();
             out.close();
