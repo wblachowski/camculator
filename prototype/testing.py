@@ -27,6 +27,7 @@ def test_many(directory, display):
     for file in os.listdir(directory):
         if file.endswith('.txt'):
             continue
+        print(file)
         file_fullpath = f'{directory}/{file}'
         expressions = test(file_fullpath, display)
         count += 1
@@ -35,14 +36,13 @@ def test_many(directory, display):
         else:
             print(f'Recognized {" ".join(expressions)}')
             print(f'Expected {" ".join(correct_map[file])}')
+        print("=======")
     print(f'Correctly recognized: {100*correct / count}%')
 
 
 def test(file, display):
     data = extraction.extract(file)
     expressions, img_predictions = interpretation.get_expressions(data, classifier, createImage=display)
-
-    print("=======")
     print(*expressions)
     try:
         sympy_equations = []
