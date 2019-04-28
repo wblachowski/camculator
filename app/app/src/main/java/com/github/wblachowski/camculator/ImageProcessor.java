@@ -31,6 +31,7 @@ import static org.opencv.photo.Photo.fastNlMeansDenoising;
 
 public class ImageProcessor {
 
+    private static final double SCALE_FACTOR=0.5;
     private boolean processing = false;
 
     public Bitmap process(Bitmap imageBitmap) {
@@ -38,12 +39,15 @@ public class ImageProcessor {
         Mat img = new Mat();
         Bitmap bmp32 = imageBitmap.copy(Bitmap.Config.ARGB_8888, true);
         Utils.bitmapToMat(bmp32, img);
+        Size orgSize = img.size();
 
+        resize(img,img, new Size(orgSize.width*SCALE_FACTOR, orgSize.height*SCALE_FACTOR));
         Mat binaryImg = fetchBinaryImg(img);
         Mat boxesImg = binaryImg.clone();
         List<Rect> boxes = fetchBoxes(binaryImg, boxesImg);
         List<Mat> symbols = extractSymbols(binaryImg, boxes);
 
+        resize(boxesImg,boxesImg, orgSize);
         Utils.matToBitmap(boxesImg, bmp32);
         processing = false;
         return bmp32;
