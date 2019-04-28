@@ -12,19 +12,18 @@
         android:layout_weight="1"
         />
     <FrameLayout
-        android:layout_width="700px"
-        android:layout_height="500px"
-        android:layout_gravity="top|right"
-        android:layout_marginTop="100px"
-        android:layout_marginRight="200px"
+        android:id="@+id/crop_preview"
+        android:layout_width="300dp"
+        android:layout_height="150dp"
+        android:layout_gravity="top|center"
+        android:layout_marginTop="50dp"
         android:background="@drawable/border"></FrameLayout>
     <ImageView
         android:id="@+id/frame_preview"
-        android:layout_width="700px"
-        android:layout_height="500px"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="100px"
-        android:layout_marginRight="200px"
+        android:layout_width="300dp"
+        android:layout_height="150dp"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="50dp"
         android:background="@drawable/border">
     </ImageView>
 </FrameLayout>

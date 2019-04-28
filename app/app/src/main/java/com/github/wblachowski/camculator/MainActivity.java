@@ -9,8 +9,8 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -26,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private Camera camera;
     private CameraPreview cameraPreview;
     private ImageView framePreview;
-
+    private FrameLayout cropPreview;
+    private Rect cropRectangle = new Rect();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,21 +45,31 @@ public class MainActivity extends AppCompatActivity {
         camera = getCameraInstance();
         cameraPreview = new CameraPreview(this, camera);
         FrameLayout preview = findViewById(R.id.camera_preview);
-        framePreview = findViewById(R.id.frame_preview);
         preview.addView(cameraPreview);
+        framePreview = findViewById(R.id.frame_preview);
+        cropPreview = findViewById(R.id.crop_preview);
     }
 
-    public void onPreviewFrame(byte[] data, Camera camera){
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        PixelConverter pixelConverter = new PixelConverter(getResources().getDisplayMetrics());
+        int top = (getResources().getDisplayMetrics().widthPixels - cropPreview.getWidth()) / 2;
+        int left = (int) pixelConverter.fromDp(50);
+        cropRectangle = new Rect(left, top, cropPreview.getHeight() + left, cropPreview.getWidth() + top);
+    }
+
+    public void onPreviewFrame(byte[] data, Camera camera) {
         Camera.Parameters parameters = camera.getParameters();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         YuvImage yuvImage = new YuvImage(data, parameters.getPreviewFormat(), parameters.getPreviewSize().width, parameters.getPreviewSize().height, null);
 
-        yuvImage.compressToJpeg(new Rect(100, 200, 600, 900), 90, out);
+        yuvImage.compressToJpeg(cropRectangle, 90, out);
         byte[] imageBytes = out.toByteArray();
         Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
         Matrix matrix = new Matrix();
         matrix.postRotate(90);
-        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap , 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
         framePreview.setImageBitmap(rotatedBitmap);
         try {
             out.flush();
@@ -68,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void askForCameraPermission(){
+    private void askForCameraPermission() {
         final RxPermissions rxPermissions = new RxPermissions(this);
         rxPermissions
                 .request(Manifest.permission.CAMERA)
@@ -80,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean checkCameraHardware(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
             // this device has a camera
             return true;
         } else {
@@ -89,13 +100,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /** A safe way to get an instance of the Camera object. */
-    private static Camera getCameraInstance(){
+    /**
+     * A safe way to get an instance of the Camera object.
+     */
+    private static Camera getCameraInstance() {
         Camera c = null;
         try {
             c = Camera.open(); // attempt to get a Camera instance
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             // Camera is not available (in use or does not exist)
         }
