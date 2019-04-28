@@ -18,6 +18,8 @@ import android.widget.ImageView;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import org.opencv.android.OpenCVLoader;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -28,10 +30,12 @@ public class MainActivity extends AppCompatActivity {
     private ImageView framePreview;
     private FrameLayout cropPreview;
     private Rect cropRectangle = new Rect();
+    private ImageProcessor imageProcessor = new ImageProcessor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        OpenCVLoader.initDebug();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -60,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onPreviewFrame(byte[] data, Camera camera) {
+        if(imageProcessor.isProcessing()){
+            return;
+        }
         Camera.Parameters parameters = camera.getParameters();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         YuvImage yuvImage = new YuvImage(data, parameters.getPreviewFormat(), parameters.getPreviewSize().width, parameters.getPreviewSize().height, null);
@@ -69,8 +76,8 @@ public class MainActivity extends AppCompatActivity {
         Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
         Matrix matrix = new Matrix();
         matrix.postRotate(90);
-        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-        framePreview.setImageBitmap(rotatedBitmap);
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        new ImageProcessingTask().execute(imageProcessor, bitmap, framePreview);
         try {
             out.flush();
             out.close();
@@ -114,4 +121,10 @@ public class MainActivity extends AppCompatActivity {
         return c; // returns null if camera is unavailable
     }
 
+    private void releaseCamera() {
+        if (camera != null) {
+            camera.release();
+            camera = null;
+        }
+    }
 }
