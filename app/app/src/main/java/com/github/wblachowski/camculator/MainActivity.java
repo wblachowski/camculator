@@ -18,9 +18,7 @@ import android.widget.ImageView;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
-import org.deeplearning4j.nn.modelimport.keras.exceptions.InvalidKerasConfigurationException;
-import org.deeplearning4j.nn.modelimport.keras.exceptions.UnsupportedKerasConfigurationException;
-import org.opencv.osgi.OpenCVNativeLoader;
+import org.opencv.android.OpenCVLoader;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -41,14 +39,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OpenCVLoader.initDebug();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
+        OpenCVLoader.initDebug();
         askForCameraPermission();
-        File file = new File(this.getFilesDir() + File.separator + "model.pb");
+        File file = new File(this.getFilesDir() + File.separator + "model.tflite");
         try {
             InputStream inputStream = getResources().openRawResource(R.raw.model);
             FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -87,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onPreviewFrame(byte[] data, Camera camera) {
-        if (imageProcessor.isProcessing()) {
+        if (imageProcessor.isProcessing() || equationInterpreter.processing) {
             return;
         }
         Camera.Parameters parameters = camera.getParameters();

@@ -101,7 +101,7 @@ public class ImageProcessor {
     }
 
     private List<Mat> extractSymbols(Mat binaryImg, List<Rect> boxes) {
-        int size = 256;
+        int size = 28;
         final Scalar WHITE_SCALAR = new Scalar(255);
         List<Mat> symbols = new ArrayList<>();
         List<Rect> newBoxes = new ArrayList<>();

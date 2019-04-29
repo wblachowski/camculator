@@ -17,8 +17,8 @@ public class ImageProcessingTask extends AsyncTask<Object, Void, ImageProcessing
         Bitmap bitmap = (Bitmap) objects[2];
         preview = (ImageView) objects[3];
         ImageProcessingResult result = imageProcessor.process(bitmap);
-//        List<String> equations = equationIntepreter.findEquations(result.imgSize,result.boxes,result.symbols);
-//        System.out.println(equations);
+        List<String> equations = equationIntepreter.findEquations(result.imgSize,result.boxes,result.symbols);
+        System.out.println(equations);
         return result;
     }
 
