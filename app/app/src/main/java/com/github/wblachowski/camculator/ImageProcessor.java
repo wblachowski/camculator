@@ -2,6 +2,8 @@ package com.github.wblachowski.camculator;
 
 import android.graphics.Bitmap;
 
+import com.github.wblachowski.camculator.processing.result.ImagePreprocessingResult;
+
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -34,7 +36,7 @@ public class ImageProcessor {
     private static final double SCALE_FACTOR = 0.5;
     private boolean processing = false;
 
-    public ImageProcessingResult process(Bitmap imageBitmap) {
+    public ImagePreprocessingResult process(Bitmap imageBitmap) {
         processing = true;
         Mat img = new Mat();
         Bitmap bmp32 = imageBitmap.copy(Bitmap.Config.ARGB_8888, true);
@@ -50,7 +52,7 @@ public class ImageProcessor {
         resize(boxesImg, boxesImg, orgSize);
         Utils.matToBitmap(boxesImg, bmp32);
         processing = false;
-        return new ImageProcessingResult(bmp32, img.size(), boxes, symbols);
+        return new ImagePreprocessingResult(bmp32, img.size(), boxes, symbols);
     }
 
     public boolean isProcessing() {

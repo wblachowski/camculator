@@ -11,13 +11,25 @@
         android:layout_height="fill_parent"
         android:layout_weight="1"
         />
-    <FrameLayout
-        android:id="@+id/crop_preview"
-        android:layout_width="300dp"
-        android:layout_height="150dp"
-        android:layout_gravity="top|center"
-        android:layout_marginTop="50dp"
-        android:background="@drawable/border"></FrameLayout>
+    <RelativeLayout
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent">
+        <FrameLayout
+            android:id="@+id/crop_preview"
+            android:layout_width="300dp"
+            android:layout_height="150dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/border"></FrameLayout>
+        <TextView
+            android:id="@+id/equations_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_below="@id/crop_preview"/>
+    </RelativeLayout>
+
     <ImageView
         android:id="@+id/frame_preview"
         android:layout_width="300dp"

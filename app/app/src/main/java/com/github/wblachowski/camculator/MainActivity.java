@@ -15,6 +15,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private CameraPreview cameraPreview;
     private ImageView framePreview;
     private FrameLayout cropPreview;
+    private TextView equationsTextView;
     private Rect cropRectangle = new Rect();
     private ImageProcessor imageProcessor = new ImageProcessor();
     private EquationInterpreter equationInterpreter;
@@ -73,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         preview.addView(cameraPreview);
         framePreview = findViewById(R.id.frame_preview);
         cropPreview = findViewById(R.id.crop_preview);
+        equationsTextView = findViewById(R.id.equations_view);
     }
 
     @Override
@@ -98,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         Matrix matrix = new Matrix();
         matrix.postRotate(90);
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-        new ImageProcessingTask().execute(imageProcessor, equationInterpreter, bitmap, framePreview);
+        new ImageProcessingTask().execute(imageProcessor, equationInterpreter, bitmap, framePreview, equationsTextView);
         try {
             out.flush();
             out.close();
