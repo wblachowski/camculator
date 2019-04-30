@@ -42,12 +42,6 @@ public class EquationInterpreter {
         return result;
     }
 
-    private void convertSymbol(Mat symbol) {
-//        threshold(symbol, symbol,127, 255, THRESH_BINARY);
-//        symbol.reshape(28, 28, -1);
-//        image = np.symbol.reshape(image, (1, 28, 28, 1))
-    }
-
     //convert opencv mat to tensorflowlite input
     private void convertMattoTfLiteInput(Mat mat) {
         threshold(mat, mat,127, 255, THRESH_BINARY);
