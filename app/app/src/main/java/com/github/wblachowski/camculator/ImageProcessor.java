@@ -50,6 +50,13 @@ public class ImageProcessor {
         List<Mat> symbols = extractSymbols(binaryImg, boxes);
 
         resize(boxesImg, boxesImg, orgSize);
+
+        for(int i=0;i<6;i++){
+            if(i>=symbols.size())break;
+            Mat scaledSymbol = new Mat();
+            resize(symbols.get(i),scaledSymbol,new Size(128,128));
+            scaledSymbol.rowRange(0,127).colRange(0,127).copyTo(boxesImg.rowRange(0,127).colRange(128*i,127+128*i));
+        }
         Utils.matToBitmap(boxesImg, bmp32);
         processing = false;
         return new ImagePreprocessingResult(bmp32, img.size(), boxes, symbols);
