@@ -2,7 +2,7 @@
 
 from os import listdir
 from os.path import isfile, join
-
+from statistics import stdev
 
 def files(mypath):
     onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
@@ -40,4 +40,7 @@ file = open("data_info.txt",'w')
 
 
 for k,v in d.items():
+    print('%s  %s' % (new[k],v))
     file.write('%s  %s \n' % (new[k],v))
+	
+print('Standard deviation: %d' % stdev(list(d.values())))
