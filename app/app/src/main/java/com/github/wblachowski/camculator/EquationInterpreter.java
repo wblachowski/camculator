@@ -48,7 +48,7 @@ public class EquationInterpreter {
         imgData.rewind();
         for (int i = 0; i < mat.height(); ++i) {
             for (int j = 0; j < mat.width(); ++j) {
-                imgData.putFloat((float) mat.get(i, j)[0]);
+                imgData.putFloat((float) (mat.get(i, j)[0]/255.));
             }
         }
     }
