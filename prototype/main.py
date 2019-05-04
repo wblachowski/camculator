@@ -1,21 +1,16 @@
-
-import os
 from os import listdir
 from os.path import isfile, join
-import keras
+
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
+
 batch_size = 128
 num_classes = 18
 epochs = 30
 import keras
-from keras.datasets import mnist
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten, Activation
+from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
-from keras import backend as K
-from keras.layers.normalization import BatchNormalization
 import sklearn.model_selection
 
 def split_data(X,y,test_size):
@@ -45,7 +40,7 @@ def convert(filename,path):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     _,image = cv2.threshold(image,127,255,cv2.THRESH_BINARY)
     image = np.reshape(image,(28,28,-1))
-    image = np.reshape(image,(28,28,1))
+    image = np.reshape(image,(28,28,1)).astype('float32')
     return image
 
 
@@ -53,30 +48,19 @@ def convert(filename,path):
 
 def get_model():
     model = Sequential()
-    model.add(Conv2D(32, (3, 3), input_shape=(28, 28, 1)))
-    model.add(Activation('relu'))
-    BatchNormalization(axis=-1)
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
+    model.add(Conv2D(32, kernel_size=(3, 3),
+                     activation='relu',
+                     input_shape=(28, 28,1)))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
-    BatchNormalization(axis=-1)
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    BatchNormalization(axis=-1)
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
     model.add(Flatten())
-    # Fully connected layer
-    BatchNormalization()
-    model.add(Dense(512))
-    model.add(Activation('relu'))
-    BatchNormalization()
-    model.add(Dropout(0.2))
-    model.add(Dense(18))
-    model.add(Activation('softmax'))
+    model.add(Dense(128, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(num_classes, activation='softmax'))
+
     model.compile(loss=keras.losses.categorical_crossentropy,
-                  optimizer=keras.optimizers.Adam(),
+                  optimizer=keras.optimizers.Adadelta(),
                   metrics=['accuracy'])
     return model
 
