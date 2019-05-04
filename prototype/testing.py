@@ -18,9 +18,11 @@ parser.add_argument('-m', '--model', nargs='?', default=DEFAULT_MODEL_MATH,
                     help=f'Path for .h5 file with neural net model. The default value is \'{DEFAULT_MODEL_MATH}\'.')
 parser.add_argument('-d', '--display', action='store_true',
                     help='Flag saying whether output image should be shown. False by default.')
+parser.add_argument('-c', '--calculate', action='store_true',
+                    help='Flag saying whether equations should be solved.')
 
 
-def test_many(directory, display):
+def test_many(directory, display, calculate):
     correct_map = get_correct_map(directory)
     correct = 0
     count = 0
@@ -29,7 +31,7 @@ def test_many(directory, display):
             continue
         print(file)
         file_fullpath = f'{directory}/{file}'
-        expressions = test(file_fullpath, display)
+        expressions = test(file_fullpath, display, calculate)
         count += 1
         if expressions == correct_map[file]:
             correct += 1
@@ -37,26 +39,29 @@ def test_many(directory, display):
             print(f'Recognized {" ".join(expressions)}')
             print(f'Expected {" ".join(correct_map[file])}')
         print("=======")
-    print(f'Correctly recognized: {100*correct / count}%')
+    print(f'Correctly recognized: {100 * correct / count}%')
 
 
-def test(file, display):
+def test(file, display, calculate):
     data = extraction.extract(file)
     expressions, img_predictions = interpretation.get_expressions(data, classifier, createImage=display)
     print(*expressions)
-    try:
-        sympy_equations = []
-        for expression in expressions:
-            parts = expression.split('=')
-            sympy_equations.append(Eq(parse_expr(parts[0]), parse_expr(parts[1])))
-        result = solve(sympy_equations, x, y, w, z)
-    except:
-        result = 'Unknown'
-    print("Result:", result)
+    if calculate:
+        try:
+            sympy_equations = []
+            for expression in expressions:
+                parts = expression.split('=')
+                sympy_equations.append(Eq(parse_expr(parts[0]), parse_expr(parts[1])))
+            result = solve(sympy_equations, x, y, w, z)
+        except:
+            result = 'Unknown'
+        print("Result:", result)
 
     if display:
-        plt.title(
-            f'Found {len(expressions)} equation(s) in {file}:\n' + '\n'.join(expressions) + f'\n\nResult:{result}')
+        title = f'Found {len(expressions)} equation(s) in {file}:\n' + '\n'.join(expressions)
+        if calculate:
+            title += f'\n\nResult:{result}'
+        plt.title(title)
         plt.imshow(img_predictions, cmap='gray')
         plt.show()
     return expressions
@@ -76,8 +81,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     classifier = Classifier(args.model)
     if os.path.isdir(args.source):
-        test_many(args.source, args.display)
+        test_many(args.source, args.display, args.calculate)
     elif os.path.isfile(args.source):
-        test(args.source, args.display)
+        test(args.source, args.display, args.calculate)
     else:
         print("Wrong source!")
