@@ -121,16 +121,16 @@ public class ImageProcessor {
                 if (newx == 0) continue;
                 resize(symbol, symbol, new Size(newx, size));
                 int rest = size - newx;
-                int restLeft = (int) Math.ceil(rest / 2);
-                int restRight = (int) Math.floor(rest / 2);
+                int restLeft = (int) Math.ceil((double)rest / 2.);
+                int restRight = (int) Math.floor((double)rest / 2.);
                 Core.hconcat(Arrays.asList(new Mat(size, restLeft, CV_8UC1, WHITE_SCALAR), symbol, new Mat(size, restRight, CV_8UC1, WHITE_SCALAR)), symbol);
             } else {
                 int newy = size * box.height / box.width;
                 if (newy == 0) continue;
                 resize(symbol, symbol, new Size(size, newy));
                 int rest = size - newy;
-                int restUp = (int) Math.ceil(rest / 2);
-                int restDown = (int) Math.floor(rest / 2);
+                int restUp = (int) Math.ceil((double)rest / 2.);
+                int restDown = (int) Math.floor((double)rest / 2.);
                 Core.vconcat(Arrays.asList(new Mat(restUp, size, CV_8UC1, WHITE_SCALAR), symbol, new Mat(restDown, size, CV_8UC1, WHITE_SCALAR)), symbol);
             }
             symbols.add(symbol);
