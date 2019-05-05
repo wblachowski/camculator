@@ -12,8 +12,8 @@ import java.util.List;
 
 public class ImageProcessingTask extends AsyncTask<Object, Void, CompleteResult> {
 
-    ImageView preview;
-    TextView equationsTextView;
+    private ImageView preview;
+    private TextView equationsTextView;
 
     @Override
     protected CompleteResult doInBackground(Object[] objects) {
@@ -23,12 +23,12 @@ public class ImageProcessingTask extends AsyncTask<Object, Void, CompleteResult>
         preview = (ImageView) objects[3];
         equationsTextView = (TextView) objects[4];
         ImagePreprocessingResult result = imageProcessor.process(bitmap);
-        List<String> equations = equationIntepreter.findEquations(result.getImgSize(),result.getBoxes(),result.getSymbols());
+        List<String> equations = equationIntepreter.findEquations(result.getSymbols());
         return new CompleteResult(result, equations);
     }
 
     protected void onPostExecute(CompleteResult result) {
         preview.setImageBitmap(result.getPreprocessingResult().getBoxesImg());
-        equationsTextView.setText(result.getEquations().stream().map(s->s+' ').reduce(String::concat).orElse(""));
+        equationsTextView.setText(result.getEquations().stream().map(s -> s + '\n').reduce(String::concat).orElse(""));
     }
 }

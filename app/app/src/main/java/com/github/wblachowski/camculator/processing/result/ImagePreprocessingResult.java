@@ -2,23 +2,15 @@ package com.github.wblachowski.camculator.processing.result;
 
 import android.graphics.Bitmap;
 
-import org.opencv.core.Mat;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
-
-import java.util.List;
+import com.github.wblachowski.camculator.Symbols;
 
 public class ImagePreprocessingResult {
 
     private final Bitmap boxesImg;
-    private final Size imgSize;
-    private final List<Rect> boxes;
-    private final List<Mat> symbols;
+    private final Symbols symbols;
 
-    public ImagePreprocessingResult(Bitmap boxesImg, Size imgSize, List<Rect> boxes, List<Mat> symbols) {
+    public ImagePreprocessingResult(Bitmap boxesImg, Symbols symbols) {
         this.boxesImg = boxesImg;
-        this.imgSize = imgSize;
-        this.boxes = boxes;
         this.symbols = symbols;
     }
 
@@ -26,15 +18,7 @@ public class ImagePreprocessingResult {
         return boxesImg;
     }
 
-    public Size getImgSize() {
-        return imgSize;
-    }
-
-    public List<Rect> getBoxes() {
-        return boxes;
-    }
-
-    public List<Mat> getSymbols() {
+    public Symbols getSymbols() {
         return symbols;
     }
 }

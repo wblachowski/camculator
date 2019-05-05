@@ -47,7 +47,7 @@ public class ImageProcessor {
         Mat binaryImg = fetchBinaryImg(img);
         Mat boxesImg = binaryImg.clone();
         List<Rect> boxes = fetchBoxes(binaryImg, boxesImg);
-        List<Mat> symbols = extractSymbols(binaryImg, boxes);
+        Symbols symbols = extractSymbols(binaryImg, boxes);
 
         resize(boxesImg, boxesImg, orgSize);
 
@@ -60,7 +60,7 @@ public class ImageProcessor {
 //        }
         Utils.matToBitmap(boxesImg, bmp32);
         processing = false;
-        return new ImagePreprocessingResult(bmp32, img.size(), boxes, symbols);
+        return new ImagePreprocessingResult(bmp32, symbols);
     }
 
     public boolean isProcessing() {
@@ -110,7 +110,7 @@ public class ImageProcessor {
         return boxes;
     }
 
-    private List<Mat> extractSymbols(Mat binaryImg, List<Rect> boxes) {
+    private Symbols extractSymbols(Mat binaryImg, List<Rect> boxes) {
         int size = 28;
         final Scalar WHITE_SCALAR = new Scalar(255);
         List<Mat> symbols = new ArrayList<>();
@@ -122,21 +122,21 @@ public class ImageProcessor {
                 if (newx == 0) continue;
                 resize(symbol, symbol, new Size(newx, size));
                 int rest = size - newx;
-                int restLeft = (int) Math.ceil((double)rest / 2.);
-                int restRight = (int) Math.floor((double)rest / 2.);
+                int restLeft = (int) Math.ceil((double) rest / 2.);
+                int restRight = (int) Math.floor((double) rest / 2.);
                 Core.hconcat(Arrays.asList(new Mat(size, restLeft, CV_8UC1, WHITE_SCALAR), symbol, new Mat(size, restRight, CV_8UC1, WHITE_SCALAR)), symbol);
             } else {
                 int newy = size * box.height / box.width;
                 if (newy == 0) continue;
                 resize(symbol, symbol, new Size(size, newy));
                 int rest = size - newy;
-                int restUp = (int) Math.ceil((double)rest / 2.);
-                int restDown = (int) Math.floor((double)rest / 2.);
+                int restUp = (int) Math.ceil((double) rest / 2.);
+                int restDown = (int) Math.floor((double) rest / 2.);
                 Core.vconcat(Arrays.asList(new Mat(restUp, size, CV_8UC1, WHITE_SCALAR), symbol, new Mat(restDown, size, CV_8UC1, WHITE_SCALAR)), symbol);
             }
             symbols.add(symbol);
             newBoxes.add(box);
         }
-        return symbols;
+        return new Symbols(newBoxes, symbols);
     }
 }
