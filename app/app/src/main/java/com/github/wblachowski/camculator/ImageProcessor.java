@@ -47,7 +47,7 @@ public class ImageProcessor {
         Mat binaryImg = fetchBinaryImg(img);
         Mat boxesImg = binaryImg.clone();
         List<Rect> boxes = fetchBoxes(binaryImg, boxesImg);
-        Symbols symbols = extractSymbols(binaryImg, boxes);
+        List<Symbol> symbols = extractSymbols(binaryImg, boxes);
 
         resize(boxesImg, boxesImg, orgSize);
 
@@ -110,11 +110,10 @@ public class ImageProcessor {
         return boxes;
     }
 
-    private Symbols extractSymbols(Mat binaryImg, List<Rect> boxes) {
+    private List<Symbol> extractSymbols(Mat binaryImg, List<Rect> boxes) {
         int size = 28;
         final Scalar WHITE_SCALAR = new Scalar(255);
-        List<Mat> symbols = new ArrayList<>();
-        List<Rect> newBoxes = new ArrayList<>();
+        List<Symbol> symbols = new ArrayList<>();
         for (Rect box : boxes) {
             Mat symbol = binaryImg.submat(box);
             if (box.height >= box.width) {
@@ -134,9 +133,8 @@ public class ImageProcessor {
                 int restDown = (int) Math.floor((double) rest / 2.);
                 Core.vconcat(Arrays.asList(new Mat(restUp, size, CV_8UC1, WHITE_SCALAR), symbol, new Mat(restDown, size, CV_8UC1, WHITE_SCALAR)), symbol);
             }
-            symbols.add(symbol);
-            newBoxes.add(box);
+            symbols.add(new Symbol(box, symbol));
         }
-        return new Symbols(newBoxes, symbols);
+        return symbols;
     }
 }

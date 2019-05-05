@@ -8,6 +8,8 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.opencv.imgproc.Imgproc.THRESH_BINARY;
@@ -28,19 +30,20 @@ public class EquationInterpreter {
         probArray = new float[1][18];
     }
 
-    public List<String> findEquations(Symbols symbols) {
-        List<List<Mat>> equations = getEquations(symbols);
+    public List<String> findEquations(List<Symbol> symbols) {
+        List<List<Symbol>> equations = getEquations(symbols);
         processing = true;
         List<String> result = new ArrayList<>();
-        for (List<Mat> equation : equations) {
-            StringBuilder equationBuilder = new StringBuilder();
-            for (Mat symbol : equation) {
-                if (symbol == null) continue;
-                convertMattoTfLiteInput(symbol);
+        for (List<Symbol> equation : equations) {
+            List<String> predictions = new ArrayList<>();
+            for (Symbol symbol : equation) {
+                Mat img = symbol.getImage();
+                if (img == null) continue;
+                convertMattoTfLiteInput(img);
                 interpreter.run(imgData, probArray);
-                equationBuilder.append(findMaxProbSymbol(probArray[0]));
+                predictions.add(findMaxProbSymbol(probArray[0]));
             }
-            result.add(equationBuilder.toString());
+            result.add(getAnalizedEquation(predictions, equation));
         }
         processing = false;
         return result;
@@ -50,23 +53,25 @@ public class EquationInterpreter {
         return processing;
     }
 
-    private List<List<Mat>> getEquations(Symbols symbols) {
-        Symbols symbolsCopy = new Symbols(symbols);
-        List<List<Mat>> equations = new ArrayList<>();
-        while (!symbolsCopy.getBoxes().isEmpty()) {
-            Rect box = symbolsCopy.getBoxes().get(0);
-            List<Rect> boxesToRemove = new ArrayList<>();
-            List<Mat> imagesToRemove = new ArrayList<>();
-            for (int j = 0; j < symbolsCopy.getBoxes().size(); j++) {
-                Rect compBox = symbolsCopy.getBoxes().get(j);
-                if (Math.max(box.y, compBox.y) <= Math.min(box.y + box.height, compBox.y + compBox.height)) {
-                    boxesToRemove.add(symbolsCopy.getBoxes().get(j));
-                    imagesToRemove.add(symbolsCopy.getImages().get(j));
+    private List<List<Symbol>> getEquations(List<Symbol> symbols) {
+        List<Symbol> symbolsCopy = new ArrayList<>(symbols);
+        List<List<Symbol>> equations = new ArrayList<>();
+        while (!symbolsCopy.isEmpty()) {
+            Rect box = symbolsCopy.get(0).getBox();
+            int rangeA = box.y;
+            int rangeB = box.y + box.height;
+            List<Symbol> symbolsToRemove = new ArrayList<>();
+            for (int j = 0; j < symbolsCopy.size(); j++) {
+                Rect compBox = symbolsCopy.get(j).getBox();
+                if (Math.max(rangeA, compBox.y) <= Math.min(rangeB, compBox.y + compBox.height)) {
+                    rangeA = Math.min(rangeA, compBox.y);
+                    rangeB = Math.max(rangeB, compBox.y + compBox.height);
+                    symbolsToRemove.add(symbolsCopy.get(j));
                 }
             }
-            symbolsCopy.getBoxes().removeAll(boxesToRemove);
-            symbolsCopy.getImages().removeAll(imagesToRemove);
-            equations.add(new ArrayList<>(imagesToRemove));
+            symbolsCopy.removeAll(symbolsToRemove);
+            symbolsToRemove.sort(Comparator.comparingInt(s->s.getBox().x));
+            equations.add(new ArrayList<>(symbolsToRemove));
         }
         return equations;
     }
@@ -88,5 +93,34 @@ public class EquationInterpreter {
             maxAt = array[i] > array[maxAt] ? i : maxAt;
         }
         return LABELS[maxAt];
+    }
+
+    private String getAnalizedEquation(List<String> predictions, List<Symbol> symbols) {
+        StringBuilder expression = new StringBuilder();
+        int i = 0;
+        while (i < predictions.size()) {
+            if (predictions.get(i).equals("-") && i + 1 < predictions.size() && predictions.get(i + 1).equals("-") && isEquals(symbols.get(i).getBox(), symbols.get(i + 1).getBox())) {
+                expression.append("=");
+                i++;
+            } else if (i > 0 && isPower(symbols.get(i - 1).getBox(), symbols.get(i).getBox(), predictions.get(i - 1), predictions.get(i))) {
+                expression.append("^").append(predictions.get(i));
+            } else {
+                expression.append(predictions.get(i));
+            }
+            i++;
+        }
+        return expression.toString();
+    }
+
+    private boolean isEquals(Rect box1, Rect box2) {
+        return Math.abs(box1.x - box2.x) < Math.max(box1.width, box2.width);
+    }
+
+    private boolean isPower(Rect base, Rect power, String basePrediction, String powerPrediction) {
+        List<String> illegalSymbols = Arrays.asList("+", "-", "/", "*");
+        if (illegalSymbols.contains(basePrediction) || illegalSymbols.contains(powerPrediction)) {
+            return false;
+        }
+        return power.y < base.y && power.y + power.height < base.y + 0.5 * base.height && power.x > base.x + 0.5 * base.width;
     }
 }
