@@ -29,6 +29,6 @@ public class ImageProcessingTask extends AsyncTask<Object, Void, CompleteResult>
 
     protected void onPostExecute(CompleteResult result) {
         preview.setImageBitmap(result.getPreprocessingResult().getBoxesImg());
-        equationsTextView.setText(result.getEquations().stream().map(s->s+'\n').reduce(String::concat).orElse(""));
+        equationsTextView.setText(result.getEquations().stream().map(s->s+' ').reduce(String::concat).orElse(""));
     }
 }
