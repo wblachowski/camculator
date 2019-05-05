@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         equationInterpreter = new EquationInterpreter(file);
 
         //TODO handle unavailable camera
-        boolean access = checkCameraHardware(getApplicationContext());
+        boolean hasCameraAccess = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
 
         camera = getCameraInstance();
         cameraPreview = new CameraPreview(this, camera);
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onPreviewFrame(byte[] data, Camera camera) {
-        if (imageProcessor.isProcessing() || equationInterpreter.processing) {
+        if (imageProcessor.isProcessing() || equationInterpreter.isProcessing()) {
             return;
         }
         Camera.Parameters parameters = camera.getParameters();
@@ -121,16 +121,6 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private boolean checkCameraHardware(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-            // this device has a camera
-            return true;
-        } else {
-            // no camera on this device
-            return false;
-        }
-    }
-
     /**
      * A safe way to get an instance of the Camera object.
      */
@@ -145,10 +135,21 @@ public class MainActivity extends AppCompatActivity {
         return c; // returns null if camera is unavailable
     }
 
-    private void releaseCamera() {
+    @Override
+    protected void onPause() {
+        super.onPause();
         if (camera != null) {
             camera.release();
             camera = null;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        camera = getCameraInstance();
+        cameraPreview = new CameraPreview(this, camera);
+        FrameLayout preview = findViewById(R.id.camera_preview);
+        preview.addView(cameraPreview);
     }
 }

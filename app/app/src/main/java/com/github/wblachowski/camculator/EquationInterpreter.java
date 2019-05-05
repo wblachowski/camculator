@@ -46,6 +46,10 @@ public class EquationInterpreter {
         return result;
     }
 
+    public boolean isProcessing() {
+        return processing;
+    }
+
     private List<List<Mat>> getEquations(Symbols symbols) {
         Symbols symbolsCopy = new Symbols(symbols);
         List<List<Mat>> equations = new ArrayList<>();
