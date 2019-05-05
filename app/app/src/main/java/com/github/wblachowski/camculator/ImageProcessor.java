@@ -102,8 +102,8 @@ public class ImageProcessor {
             }
         }
 
-        //Sort boxes horizontally
-        boxes.sort(Comparator.comparingInt(b -> b.x));
+        //Sort boxes vertically
+        boxes.sort(Comparator.comparingInt(b -> b.y));
         for (Rect box : boxes) {
             rectangle(boxesImg, new Point(box.x, box.y), new Point(box.x + box.width, box.y + box.height), new Scalar(0, 255, 0));
         }
