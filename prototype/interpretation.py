@@ -29,7 +29,7 @@ def get_expressions(data, classifier, createImage=False):
                     boxes[i], boxes[i + 1]):
                 expression += "="
                 i += 1
-            elif i > 0 and is_power(boxes[i - 1], boxes[i]):
+            elif i > 0 and is_power(boxes[i - 1], boxes[i], predictions[i - 1], predictions[i]):
                 expression += '**' + SPECIAL_SYMBOLS_MAP.get(predictions[i], predictions[i])
             else:
                 expression += SPECIAL_SYMBOLS_MAP.get(predictions[i], predictions[i])
@@ -75,7 +75,10 @@ def is_equals(box1, box2):
     return abs(x1 - x2) < max(w1, w2)
 
 
-def is_power(box_base, box_power):
+def is_power(box_base, box_power, pred_base, pred_power):
+    illegal_symbols = ["plus", "minus", "slash", "dot"]
+    if pred_base in illegal_symbols or pred_power in illegal_symbols:
+        return False
     xbase, ybase, wbase, hbase = box_base
     xpower, ypower, wpower, hpower = box_power
     return ypower < ybase and ypower + hpower < ybase + 0.5 * hbase and xpower > xbase + 0.5 * wbase
