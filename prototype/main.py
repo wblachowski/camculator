@@ -6,7 +6,7 @@ import numpy as np
 
 batch_size = 128
 num_classes = 18
-epochs = 30
+epochs = 18
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
