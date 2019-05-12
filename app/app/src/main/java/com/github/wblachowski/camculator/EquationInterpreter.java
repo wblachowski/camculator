@@ -1,5 +1,10 @@
 package com.github.wblachowski.camculator;
 
+import org.matheclipse.core.eval.EvalEngine;
+import org.matheclipse.core.eval.EvalUtilities;
+import org.matheclipse.core.eval.ExprEvaluator;
+import org.matheclipse.core.expression.F;
+import org.matheclipse.core.interfaces.IExpr;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.tensorflow.lite.Interpreter;
@@ -11,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.opencv.imgproc.Imgproc.THRESH_BINARY;
 import static org.opencv.imgproc.Imgproc.threshold;
@@ -44,6 +50,12 @@ public class EquationInterpreter {
                 predictions.add(findMaxProbSymbol(probArray[0]));
             }
             result.add(getAnalizedEquation(predictions, equation));
+        }
+        String expr= "Solve({"+result.stream().map(eq->eq.replace("=","==")).collect(Collectors.joining( "," ))+"},{x,y,w,z})";
+        try {
+            result.add(new ExprEvaluator().eval(expr).toString());
+        }catch(Throwable ex){
+                result.add(ex.getMessage());
         }
         processing = false;
         return result;

@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import org.matheclipse.core.expression.F;
 import org.opencv.android.OpenCVLoader;
 
 import java.io.ByteArrayOutputStream;
@@ -41,6 +42,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
+            F.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);

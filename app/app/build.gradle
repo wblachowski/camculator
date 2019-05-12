@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+}
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -33,4 +39,8 @@ dependencies {
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
     compile 'org.tensorflow:tensorflow-lite:1.10.0'
     implementation project(':openCVLibrary343')
+    compile ('org.matheclipse:matheclipse-core:1.0.0-SNAPSHOT'){
+        exclude module: 'log4j-core'
+    }
+    annotationProcessor 'org.apache.logging.log4j:log4j-core:2.5'
 }
