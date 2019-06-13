@@ -1,10 +1,6 @@
 package com.github.wblachowski.camculator;
 
-import org.matheclipse.core.eval.EvalEngine;
-import org.matheclipse.core.eval.EvalUtilities;
 import org.matheclipse.core.eval.ExprEvaluator;
-import org.matheclipse.core.expression.F;
-import org.matheclipse.core.interfaces.IExpr;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.tensorflow.lite.Interpreter;
@@ -51,11 +47,16 @@ public class EquationInterpreter {
             }
             result.add(getAnalizedEquation(predictions, equation));
         }
-        String expr= "Solve({"+result.stream().map(eq->eq.replace("=","==")).collect(Collectors.joining( "," ))+"},{x,y,w,z})";
+        String expr = "Solve({" + result.stream().map(eq -> eq.replace("=", "==")).collect(Collectors.joining(",")) + "},{x,y,w,z})";
         try {
-            result.add(new ExprEvaluator().eval(expr).toString());
-        }catch(Throwable ex){
-                result.add(ex.getMessage());
+            String solution = new ExprEvaluator().eval(expr).toString();
+            solution = solution.replace("Solve(", "").replace(",{x,y,w,z})", "");
+            solution = solution.substring(1, solution.length() - 2)
+                    .replaceAll("->", ": ").replaceAll("\\}", "\n").replaceAll("\\{", "")
+                    .replaceAll("\n,", "\n").replaceAll(",", ", ");
+            result.add('\n' + solution);
+        } catch (Throwable ex) {
+            result.add("Incorrect equation" + (result.size() > 1 ? "s" : ""));
         }
         processing = false;
         return result;
@@ -82,7 +83,7 @@ public class EquationInterpreter {
                 }
             }
             symbolsCopy.removeAll(symbolsToRemove);
-            symbolsToRemove.sort(Comparator.comparingInt(s->s.getBox().x));
+            symbolsToRemove.sort(Comparator.comparingInt(s -> s.getBox().x));
             equations.add(new ArrayList<>(symbolsToRemove));
         }
         return equations;
