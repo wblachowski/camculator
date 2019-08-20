@@ -1,0 +1,3 @@
+[submodule "prototype/data"]
+	path = prototype/data
+	url = https://github.com/wblachowski/bhmsds
