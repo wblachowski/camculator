@@ -10,7 +10,9 @@ parser.add_argument('-o', '--output', default='models/model.tflite', help='targe
 def convert(input_path, output_path):
     converter = tf.lite.TFLiteConverter.from_keras_model_file(input_path)
     tflite_model = converter.convert()
-    open(output_path, 'wb').write(tflite_model)
+    file = open(output_path, 'wb')
+    file.write(tflite_model)
+    file.close()
 
 
 if __name__ == "__main__":
