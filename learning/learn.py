@@ -1,56 +1,48 @@
+import argparse
 from os import listdir
 from os.path import isfile, join
 
 import cv2
-import numpy as np
-
-batch_size = 128
-num_classes = 18
-epochs = 18
 import keras
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D, MaxPooling2D
+import numpy as np
 import sklearn.model_selection
+from keras.layers import Conv2D, MaxPooling2D
+from keras.layers import Dense, Dropout, Flatten
+from keras.models import Sequential
 
-def split_data(X,y,test_size):
-    X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, test_size=test_size)
-    return X_train, X_test, y_train, y_test
+LABELS_DICT = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'dot': 10, 'minus': 11,
+               'plus': 12, 'w': 13, 'x': 14, 'y': 15, 'z': 16, 'slash': 17}
 
-
-def files(mypath):
-    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-    return onlyfiles
-
-
-labels_dict = {'0': 0, '1':1, '2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'dot':10,'minus':11,'plus':12,'w':13,'x':14,'y':15,'z':16,'slash':17}
-
-
-def labels_file_names(files):
-    labels = []
-    for f in files:
-        id = f.index('-')
-        label = labels_dict[f[0:id]]
-        labels.append(label)
-    return labels
+parser = argparse.ArgumentParser(description='Train NN on 28x28 pictures')
+parser.add_argument('-i', '--input', default='data/symbols', help='Path to data directory')
+parser.add_argument('-o', '--output', default='models/model.h5', help='Target path to h5 model')
+parser.add_argument('-b', '--batch', type=int, default=128, help='Batch size')
+parser.add_argument('-e', '--epochs', type=int, default=18, help='Number of epochs')
 
 
-def convert(filename,path):
-    image = cv2.imread(path+'\\'+filename)
+def get_files(path):
+    return [f for f in listdir(path) if isfile(join(path, f))]
+
+
+def get_files_labels(files):
+    return [LABELS_DICT[f[0:f.index('-')]] for f in files]
+
+
+def convert(path, filename):
+    image = cv2.imread(join(path, filename))
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    _,image = cv2.threshold(image,127,255,cv2.THRESH_BINARY)
-    image = np.reshape(image,(28,28,-1))
-    image = np.reshape(image,(28,28,1)).astype('float32')
+    _, image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
+    image = np.reshape(image, (28, 28, -1))
+    image = np.reshape(image, (28, 28, 1)).astype('float32')
     return image
 
 
-
-
 def get_model():
+    num_classes = len(LABELS_DICT)
     model = Sequential()
     model.add(Conv2D(32, kernel_size=(3, 3),
                      activation='relu',
-                     input_shape=(28, 28,1)))
+                     input_shape=(28, 28, 1)))
     model.add(Conv2D(64, (3, 3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.25))
@@ -64,27 +56,27 @@ def get_model():
                   metrics=['accuracy'])
     return model
 
-if __name__ == '__main__':
-    path = 'data/symbols'
-    files_names = files(path)
-    labels = labels_file_names(files_names)
-    labels = keras.utils.to_categorical(labels, num_classes)
 
-    dataset = [convert(file,path) for file in files_names]
-    dataset = np.array(dataset)
-    dataset = dataset.astype('float32')
-    dataset /= 255
-    x_train, x_test, y_train, y_test = split_data(dataset,labels,0.2)
+if __name__ == '__main__':
+    args = parser.parse_args()
+
+    files = get_files(args.input)
+    labels = get_files_labels(files)
+    labels = keras.utils.to_categorical(labels, len(LABELS_DICT))
+
+    dataset = [convert(args.input, file) for file in files]
+    dataset = np.array(dataset).astype('float32') / 255
+
+    x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(dataset, labels, test_size=0.2)
 
     model = get_model()
-    print(x_train.shape)
     model.fit(x_train, y_train,
-              batch_size=batch_size,
-              epochs=epochs,
+              batch_size=args.batch,
+              epochs=args.epochs,
               verbose=2,
               validation_data=(x_test, y_test))
     score = model.evaluate(x_test, y_test, verbose=1)
 
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
-    model.save('models\\model.h5')
+    model.save(args.output)
