@@ -3,8 +3,8 @@ import argparse
 import tensorflow as tf
 
 parser = argparse.ArgumentParser(description='Convert model from h5 to tflite format.')
-parser.add_argument('-i', '--input', default='models/model.h5', help='path to h5 model')
-parser.add_argument('-o', '--output', default='models/model.tflite', help='target path to tflite model')
+parser.add_argument('-i', '--input', default='models/model.h5', help='Path to h5 model')
+parser.add_argument('-o', '--output', default='models/model.tflite', help='Target path to tflite model')
 
 
 def convert(input_path, output_path):
