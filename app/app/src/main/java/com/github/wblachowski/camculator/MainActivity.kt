@@ -20,7 +20,7 @@ import java.io.IOException
 class MainActivity : AppCompatActivity() {
 
     private var camera: Camera? = null
-    private var cameraSurfacePreview: CameraPreview? = null
+    private var cameraSurfaceView: CameraSurfaceView? = null
     private var equationInterpreter: EquationInterpreter? = null
     private var cropRectangle = Rect()
     private val imageProcessor = ImageProcessor()
@@ -66,8 +66,8 @@ class MainActivity : AppCompatActivity() {
         val hasCameraAccess = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
 
         camera = getCameraInstance()
-        cameraSurfacePreview = CameraPreview(this, camera!!)
-        cameraPreview.addView(cameraSurfacePreview)
+        cameraSurfaceView = CameraSurfaceView(this, camera!!)
+        cameraPreview.addView(cameraSurfaceView)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -110,8 +110,8 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         camera = getCameraInstance()
-        cameraSurfacePreview = CameraPreview(this, camera!!)
-        cameraPreview.addView(cameraSurfacePreview)
+        cameraSurfaceView = CameraSurfaceView(this, camera!!)
+        cameraPreview.addView(cameraSurfaceView)
     }
 
     private fun getCameraInstance(): Camera? {
