@@ -1,38 +1,18 @@
 package com.github.wblachowski.camculator
 
 import android.graphics.Bitmap
-
 import com.github.wblachowski.camculator.processing.result.ImagePreprocessingResult
-
 import org.opencv.android.Utils
-import org.opencv.core.Core
-import org.opencv.core.Mat
-import org.opencv.core.MatOfPoint
-import org.opencv.core.Point
-import org.opencv.core.Rect
-import org.opencv.core.Scalar
-import org.opencv.core.Size
-import org.opencv.imgproc.Imgproc
-
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.Comparator
-
+import org.opencv.core.*
 import org.opencv.core.CvType.CV_8UC1
-import org.opencv.imgproc.Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C
-import org.opencv.imgproc.Imgproc.CHAIN_APPROX_SIMPLE
-import org.opencv.imgproc.Imgproc.RETR_TREE
-import org.opencv.imgproc.Imgproc.THRESH_BINARY
-import org.opencv.imgproc.Imgproc.adaptiveThreshold
-import org.opencv.imgproc.Imgproc.boundingRect
-import org.opencv.imgproc.Imgproc.findContours
-import org.opencv.imgproc.Imgproc.rectangle
-import org.opencv.imgproc.Imgproc.resize
+import org.opencv.imgproc.Imgproc
+import org.opencv.imgproc.Imgproc.*
 import org.opencv.photo.Photo.fastNlMeansDenoising
+import java.util.*
 
 class ImageProcessor {
-    var isProcessing = false
-        private set
+    private val SCALE_FACTOR = 0.5
+    var isProcessing: Boolean = false
 
     fun process(imageBitmap: Bitmap): ImagePreprocessingResult {
         isProcessing = true
@@ -48,14 +28,6 @@ class ImageProcessor {
         val symbols = extractSymbols(binaryImg, boxes)
 
         resize(boxesImg, boxesImg, orgSize)
-
-        //Uncomment for debugging purposes:
-        //        for(int i=0;i<6;i++){
-        //            if(i>=symbols.size())break;
-        //            Mat scaledSymbol = new Mat();
-        //            resize(symbols.get(i),scaledSymbol,new Size(128,128));
-        //            scaledSymbol.rowRange(0,127).colRange(0,127).copyTo(boxesImg.rowRange(0,127).colRange(128*i,127+128*i));
-        //        }
         Utils.matToBitmap(boxesImg, bmp32)
         isProcessing = false
         return ImagePreprocessingResult(bmp32, symbols)
@@ -97,7 +69,7 @@ class ImageProcessor {
         }
 
         //Sort boxes vertically
-        boxes.sortBy{it.y}
+        boxes.sortBy { it.y }
         for (box in boxes) {
             rectangle(boxesImg, Point(box.x.toDouble(), box.y.toDouble()), Point((box.x + box.width).toDouble(), (box.y + box.height).toDouble()), Scalar(0.0, 255.0, 0.0))
         }
@@ -130,10 +102,5 @@ class ImageProcessor {
             symbols.add(Symbol(box, symbol))
         }
         return symbols
-    }
-
-    companion object {
-
-        private val SCALE_FACTOR = 0.5
     }
 }

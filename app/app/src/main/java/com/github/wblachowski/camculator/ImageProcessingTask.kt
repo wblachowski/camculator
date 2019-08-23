@@ -4,10 +4,7 @@ import android.graphics.Bitmap
 import android.os.AsyncTask
 import android.widget.ImageView
 import android.widget.TextView
-
 import com.github.wblachowski.camculator.processing.result.CompleteResult
-import com.github.wblachowski.camculator.processing.result.ImagePreprocessingResult
-import java.util.function.BinaryOperator
 
 class ImageProcessingTask : AsyncTask<Any, Void, CompleteResult>() {
 
