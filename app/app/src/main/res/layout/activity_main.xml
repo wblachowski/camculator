@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
     <FrameLayout
-        android:id="@+id/camera_preview"
+        android:id="@+id/cameraPreview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_weight="1"
@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_width="fill_parent">
         <FrameLayout
-            android:id="@+id/crop_preview"
+            android:id="@+id/cropPreview"
             android:layout_width="300dp"
             android:layout_height="150dp"
             android:layout_centerHorizontal="true"
@@ -23,7 +23,7 @@
             android:background="@drawable/border"></FrameLayout>
         <TextView
             android:background="@android:color/white"
-            android:id="@+id/equations_view"
+            android:id="@+id/equationsView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="40dp"
@@ -31,11 +31,11 @@
             android:layout_marginTop="20dp"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_below="@id/crop_preview"/>
+            android:layout_below="@id/cropPreview"/>
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/frame_preview"
+        android:id="@+id/framePreview"
         android:layout_width="300dp"
         android:layout_height="150dp"
         android:layout_gravity="bottom|center"

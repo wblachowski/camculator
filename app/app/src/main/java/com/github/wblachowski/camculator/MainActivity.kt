@@ -1,61 +1,30 @@
 package com.github.wblachowski.camculator
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
-import android.graphics.Rect
-import android.graphics.YuvImage
+import android.graphics.*
 import android.hardware.Camera
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import android.view.WindowManager
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.TextView
-
 import com.tbruyelle.rxpermissions2.RxPermissions
-
+import kotlinx.android.synthetic.main.activity_main.*
 import org.matheclipse.core.expression.F
 import org.opencv.android.OpenCVLoader
-
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.io.InputStream
 
 class MainActivity : AppCompatActivity() {
 
     private var camera: Camera? = null
-    private var cameraPreview: CameraPreview? = null
-    private var framePreview: ImageView? = null
-    private var cropPreview: FrameLayout? = null
-    private var equationsTextView: TextView? = null
+    private var cameraSurfacePreview: CameraPreview? = null
+    private var equationInterpreter: EquationInterpreter? = null
     private var cropRectangle = Rect()
     private val imageProcessor = ImageProcessor()
-    private var equationInterpreter: EquationInterpreter? = null
 
-    /**
-     * A safe way to get an instance of the Camera object.
-     */
-    private// attempt to get a Camera instance
-    // Camera is not available (in use or does not exist)
-    // returns null if camera is unavailable
-    val cameraInstance: Camera?
-        get() {
-            var c: Camera? = null
-            try {
-                c = Camera.open()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            return c
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,13 +65,9 @@ class MainActivity : AppCompatActivity() {
         //TODO handle unavailable camera
         val hasCameraAccess = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
 
-        camera = cameraInstance
-        cameraPreview = CameraPreview(this, camera!!)
-        val preview = findViewById<FrameLayout>(R.id.camera_preview)
-        preview.addView(cameraPreview)
-        framePreview = findViewById(R.id.frame_preview)
-        cropPreview = findViewById(R.id.crop_preview)
-        equationsTextView = findViewById(R.id.equations_view)
+        camera = getCameraInstance()
+        cameraSurfacePreview = CameraPreview(this, camera!!)
+        cameraPreview.addView(cameraSurfacePreview)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -127,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         val matrix = Matrix()
         matrix.postRotate(90f)
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-        ImageProcessingTask().execute(imageProcessor, equationInterpreter, bitmap, framePreview, equationsTextView)
+        ImageProcessingTask().execute(imageProcessor, equationInterpreter, bitmap, framePreview, equationsView)
         try {
             out.flush()
             out.close()
@@ -137,30 +102,29 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        camera?.release()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        camera = getCameraInstance()
+        cameraSurfacePreview = CameraPreview(this, camera!!)
+        cameraPreview.addView(cameraSurfacePreview)
+    }
+
+    private fun getCameraInstance(): Camera? {
+        return Camera.open()
+    }
+
     private fun askForCameraPermission() {
-        val rxPermissions = RxPermissions(this)
-        rxPermissions
+        RxPermissions(this)
                 .request(Manifest.permission.CAMERA)
                 .subscribe { granted ->
                     if (!granted) {
                         //TODO handle camera access denial
                     }
                 }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        if (camera != null) {
-            camera!!.release()
-            camera = null
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        camera = cameraInstance
-        cameraPreview = CameraPreview(this, camera!!)
-        val preview = findViewById<FrameLayout>(R.id.camera_preview)
-        preview.addView(cameraPreview)
     }
 }
