@@ -17,7 +17,9 @@ class CameraSurfaceView(private val mainActivity: MainActivity, private val came
     override fun surfaceCreated(holder: SurfaceHolder) {
         camera.setDisplayOrientation(90)
         //set camera to continually auto-focus
-        camera.parameters.focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
+        val params = camera.parameters
+        params.focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
+        camera.parameters = params
         startCameraPreview()
     }
 
