@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 repositories {
     maven {
@@ -40,7 +41,7 @@ dependencies {
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
     compile 'org.tensorflow:tensorflow-lite:1.10.0'
     implementation project(':openCVLibrary343')
-    compile ('org.matheclipse:matheclipse-core:1.0.0-SNAPSHOT'){
+    compile('org.matheclipse:matheclipse-core:1.0.0-SNAPSHOT') {
         exclude module: 'log4j-core'
     }
     annotationProcessor 'org.apache.logging.log4j:log4j-core:2.5'

@@ -27,19 +27,20 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         try {
             F.await()
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
+        OpenCVLoader.initDebug()
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_main)
 
-        OpenCVLoader.initDebug()
         askForCameraPermission()
         val file = File(this.filesDir.toString() + File.separator + "model.tflite")
         try {
