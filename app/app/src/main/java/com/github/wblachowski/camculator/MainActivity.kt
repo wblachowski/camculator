@@ -10,35 +10,26 @@ import android.view.Window
 import android.view.WindowManager
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
-import org.matheclipse.core.expression.F
-import org.opencv.android.OpenCVLoader
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
     private var camera: Camera? = null
     private var cameraSurfaceView: CameraSurfaceView? = null
-    private var equationInterpreter: EquationInterpreter? = null
+    private var equationInterpreter = EquationInterpreter.getInstance()
     private var cropRectangle = Rect()
     private val imageProcessor = ImageProcessor()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_main)
 
         askForCameraPermission()
-
-
-        equationInterpreter = EquationInterpreter.getInstance()
 
         //TODO handle unavailable camera
         val hasCameraAccess = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
@@ -51,13 +42,13 @@ class MainActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         val pixelConverter = PixelConverter(resources.displayMetrics)
-        val top = (resources.displayMetrics.widthPixels - cropPreview!!.width) / 2
+        val top = (resources.displayMetrics.widthPixels - cropPreview.width) / 2
         val left = pixelConverter.fromDp(50f).toInt()
-        cropRectangle = Rect(left, top, cropPreview!!.height + left, cropPreview!!.width + top)
+        cropRectangle = Rect(left, top, cropPreview.height + left, cropPreview.width + top)
     }
 
     fun onPreviewFrame(data: ByteArray, camera: Camera) {
-        if (imageProcessor.isProcessing || equationInterpreter!!.isProcessing) {
+        if (imageProcessor.isProcessing || equationInterpreter.isProcessing) {
             return
         }
         val parameters = camera.parameters
@@ -82,18 +73,22 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        camera?.stopPreview()
+        camera?.setPreviewCallback(null)
         camera?.release()
+        camera = null
     }
 
     override fun onResume() {
         super.onResume()
-        camera = getCameraInstance()
-        cameraSurfaceView = CameraSurfaceView(this, camera!!)
-        cameraPreview.addView(cameraSurfaceView)
+        if (camera == null) {
+            camera = getCameraInstance()
+            cameraSurfaceView?.setCamera(camera!!)
+        }
     }
 
     private fun getCameraInstance(): Camera? {
-        return Camera.open()
+        return if (camera != null) camera else Camera.open()
     }
 
     private fun askForCameraPermission() {

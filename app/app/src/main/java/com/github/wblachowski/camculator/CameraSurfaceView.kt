@@ -6,7 +6,7 @@ import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 
-class CameraSurfaceView(private val mainActivity: MainActivity, private val camera: Camera) : SurfaceView(mainActivity), SurfaceHolder.Callback {
+class CameraSurfaceView(private val mainActivity: MainActivity, private var camera: Camera) : SurfaceView(mainActivity), SurfaceHolder.Callback {
 
     init {
         holder.addCallback(this)
@@ -15,11 +15,6 @@ class CameraSurfaceView(private val mainActivity: MainActivity, private val came
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
-        camera.setDisplayOrientation(90)
-        //set camera to continually auto-focus
-        val params = camera.parameters
-        params.focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
-        camera.parameters = params
         startCameraPreview()
     }
 
@@ -41,11 +36,20 @@ class CameraSurfaceView(private val mainActivity: MainActivity, private val came
 
     private fun startCameraPreview() {
         try {
+            camera.setDisplayOrientation(90)
+            //set camera to continually auto-focus
+            val params = camera.parameters
+            params.focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
+            camera.parameters = params
             camera.setPreviewCallback(mainActivity::onPreviewFrame)
             camera.setPreviewDisplay(holder)
             camera.startPreview()
         } catch (e: Exception) {
             Log.d(TAG, "Error starting camera preview: " + e.message)
         }
+    }
+
+    fun setCamera(camera : Camera){
+        this.camera=camera
     }
 }

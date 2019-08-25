@@ -14,6 +14,8 @@ import java.io.IOException
 
 class SplashActivity : AppCompatActivity() {
 
+    private var initialized = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -24,31 +26,27 @@ class SplashActivity : AppCompatActivity() {
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
-        if (!hasFocus) {
+        if (!hasFocus || initialized) {
             return
         }
         initialize()
         super.onWindowFocusChanged(hasFocus)
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
     private fun initialize() {
+        initialized = true
         Thread {
-            runOnUiThread{statusTextView.text = "Math loading"}
-            var cur = System.currentTimeMillis()
+            runOnUiThread { statusTextView.text = "Loading math" }
             try {
                 F.await()
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
 
-            runOnUiThread{statusTextView.text = "OpenCv loading"}
+            runOnUiThread { statusTextView.text = "Loading openCV" }
             OpenCVLoader.initDebug()
 
-            runOnUiThread{statusTextView.text = "Model loading"}
+            runOnUiThread { statusTextView.text = "Loading model" }
             val file = File(this.filesDir.toString() + File.separator + "model.tflite")
             try {
                 val inputStream = resources.openRawResource(R.raw.model)
@@ -68,7 +66,6 @@ class SplashActivity : AppCompatActivity() {
                 e1.printStackTrace()
             }
             EquationInterpreter.init(file)
-            println("@@@@Whole thing took: " + (System.currentTimeMillis() - cur))
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }.start()
