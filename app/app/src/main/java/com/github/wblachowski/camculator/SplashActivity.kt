@@ -36,17 +36,17 @@ class SplashActivity : AppCompatActivity() {
     private fun initialize() {
         initialized = true
         Thread {
-            runOnUiThread { statusTextView.text = "Loading math" }
+            runOnUiThread { statusTextView.text = "Loading math..." }
             try {
                 F.await()
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
 
-            runOnUiThread { statusTextView.text = "Loading openCV" }
+            runOnUiThread { statusTextView.text = "Loading openCV..." }
             OpenCVLoader.initDebug()
 
-            runOnUiThread { statusTextView.text = "Loading model" }
+            runOnUiThread { statusTextView.text = "Loading model..." }
             val file = File(this.filesDir.toString() + File.separator + "model.tflite")
             try {
                 val inputStream = resources.openRawResource(R.raw.model)
