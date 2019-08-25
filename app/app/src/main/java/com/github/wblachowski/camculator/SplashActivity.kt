@@ -1,10 +1,13 @@
 package com.github.wblachowski.camculator
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import android.view.WindowManager
+import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_splash.*
 import org.matheclipse.core.expression.F
 import org.opencv.android.OpenCVLoader
@@ -15,6 +18,7 @@ import java.io.IOException
 class SplashActivity : AppCompatActivity() {
 
     private var initialized = false
+    private var hasPermission = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -23,10 +27,17 @@ class SplashActivity : AppCompatActivity() {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+            askForCameraPermission()
+        } else {
+            statusTextView.text = "Failed to load the app"
+        }
+
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
-        if (!hasFocus || initialized) {
+        if (!hasFocus || initialized || !hasPermission) {
             return
         }
         initialize()
@@ -70,5 +81,16 @@ class SplashActivity : AppCompatActivity() {
             finish()
         }.start()
 
+    }
+
+    private fun askForCameraPermission() {
+        RxPermissions(this)
+                .request(Manifest.permission.CAMERA)
+                .subscribe { granted ->
+                    hasPermission = granted
+                    if (!granted) {
+                        runOnUiThread { statusTextView.text = "Failed to load the app" }
+                    }
+                }
     }
 }

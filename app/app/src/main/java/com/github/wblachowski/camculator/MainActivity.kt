@@ -1,14 +1,11 @@
 package com.github.wblachowski.camculator
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.graphics.*
 import android.hardware.Camera
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import android.view.WindowManager
-import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -28,11 +25,6 @@ class MainActivity : AppCompatActivity() {
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_main)
-
-        askForCameraPermission()
-
-        //TODO handle unavailable camera
-        val hasCameraAccess = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
 
         camera = getCameraInstance()
         cameraSurfaceView = CameraSurfaceView(this, camera!!)
@@ -91,13 +83,4 @@ class MainActivity : AppCompatActivity() {
         return if (camera != null) camera else Camera.open()
     }
 
-    private fun askForCameraPermission() {
-        RxPermissions(this)
-                .request(Manifest.permission.CAMERA)
-                .subscribe { granted ->
-                    if (!granted) {
-                        //TODO handle camera access denial
-                    }
-                }
-    }
 }
