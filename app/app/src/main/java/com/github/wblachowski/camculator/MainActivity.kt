@@ -27,14 +27,8 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-        try {
-            F.await()
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
-        }
-        OpenCVLoader.initDebug()
+
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -42,26 +36,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         askForCameraPermission()
-        val file = File(this.filesDir.toString() + File.separator + "model.tflite")
-        try {
-            val inputStream = resources.openRawResource(R.raw.model)
-            val fileOutputStream = FileOutputStream(file)
-
-            val buf = ByteArray(1024)
-            var len = inputStream.read(buf)
-            while (len > 0) {
-                fileOutputStream.write(buf, 0, len)
-                len = inputStream.read(buf)
-            }
 
 
-            fileOutputStream.close()
-            inputStream.close()
-        } catch (e1: IOException) {
-            e1.printStackTrace()
-        }
-
-        equationInterpreter = EquationInterpreter(file)
+        equationInterpreter = EquationInterpreter.getInstance()
 
         //TODO handle unavailable camera
         val hasCameraAccess = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)

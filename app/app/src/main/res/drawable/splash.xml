@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:opacity="opaque">
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
 
     <!-- Fill the background with a solid color -->
-    <item android:drawable="@color/colorAccent"/>
-
+    <item android:drawable="@color/colorPrimary" />
+    <item
+        android:width="48dp"
+        android:height="48dp"
+        android:drawable="@drawable/ic_camera_48dp"
+        android:gravity="center" />
 </layer-list>

@@ -3,18 +3,14 @@ package com.github.wblachowski.camculator
 import org.matheclipse.core.eval.ExprEvaluator
 import org.opencv.core.Mat
 import org.opencv.core.Rect
+import org.opencv.imgproc.Imgproc.THRESH_BINARY
+import org.opencv.imgproc.Imgproc.threshold
 import org.tensorflow.lite.Interpreter
-
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.Comparator
+import java.util.*
 import java.util.stream.Collectors
-
-import org.opencv.imgproc.Imgproc.THRESH_BINARY
-import org.opencv.imgproc.Imgproc.threshold
 
 class EquationInterpreter(model: File) {
 
@@ -23,6 +19,7 @@ class EquationInterpreter(model: File) {
     private val interpreter: Interpreter
     private val imgData: ByteBuffer
     private val probArray: Array<FloatArray>
+    private val LABELS = arrayOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "-", "+", "w", "x", "y", "z", "/")
 
     init {
         interpreter = Interpreter(model)
@@ -30,6 +27,8 @@ class EquationInterpreter(model: File) {
         imgData.order(ByteOrder.nativeOrder())
         probArray = Array(1) { FloatArray(18) }
     }
+
+    companion object : SingletonHolder<EquationInterpreter, File>(::EquationInterpreter)
 
     fun findEquations(symbols: List<Symbol>): List<String> {
         val equations = getEquations(symbols)
@@ -78,7 +77,7 @@ class EquationInterpreter(model: File) {
                 }
             }
             symbolsCopy.removeAll(symbolsToRemove)
-            symbolsToRemove.sortBy{it.box.x}
+            symbolsToRemove.sortBy { it.box.x }
             equations.add(ArrayList(symbolsToRemove))
         }
         return equations
@@ -131,7 +130,4 @@ class EquationInterpreter(model: File) {
         } else power.y < base.y && power.y + power.height < base.y + 0.5 * base.height && power.x > base.x + 0.5 * base.width
     }
 
-    companion object {
-        private val LABELS = arrayOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "-", "+", "w", "x", "y", "z", "/")
-    }
 }
