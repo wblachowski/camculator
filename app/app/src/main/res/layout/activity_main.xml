@@ -39,8 +39,7 @@
         <ImageView
             android:id="@+id/framePreview"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border">
+            android:layout_height="wrap_content">
     </ImageView>
     </RelativeLayout>
 </FrameLayout>
