@@ -59,6 +59,24 @@ class MainActivity : AppCompatActivity() {
         frameWrapper.layoutParams = frameWrapperParams
     }
 
+    override fun onPause() {
+        super.onPause()
+        camera?.apply {
+            stopPreview()
+            setPreviewCallback(null)
+            release()
+        }
+        camera = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (camera == null) {
+            camera = getCameraInstance()
+            cameraSurfaceView?.camera = camera!!
+        }
+    }
+
     fun onPreviewFrame(data: ByteArray, camera: Camera) {
         if (imageProcessor.isProcessing || equationInterpreter.isProcessing) {
             return
@@ -86,46 +104,18 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onPause() {
-        super.onPause()
-        camera?.stopPreview()
-        camera?.setPreviewCallback(null)
-        camera?.release()
-        camera = null
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (camera == null) {
-            camera = getCameraInstance()
-            cameraSurfaceView?.camera = camera!!
-        }
-    }
-
-    private fun getCameraInstance(): Camera? {
-        return if (camera != null) camera else Camera.open()
-    }
+    private fun getCameraInstance() = camera ?: Camera.open()
 
     private fun getDisplayWH() = Point().apply(windowManager.defaultDisplay::getSize)
 
     private fun calcCamPrevDimensions(disDim: Point, camDim: Camera.Size): Point? {
         val widthRatio = disDim.x.toDouble() / camDim.height
         val heightRatio = disDim.y.toDouble() / camDim.width
-        // use ">" to zoom preview full screen
-        if (widthRatio > heightRatio) {
-            val calcDimensions = Point()
-            calcDimensions.x = disDim.x
-            calcDimensions.y = disDim.x * camDim.width / camDim.height
-            return calcDimensions
+        return if (widthRatio >= heightRatio) {
+            Point(disDim.x, disDim.x * camDim.width / camDim.height)
+        } else {
+            Point(disDim.y * camDim.height / camDim.width, disDim.y)
         }
-        // use "<" to zoom preview full screen
-        if (widthRatio < heightRatio) {
-            val calcDimensions = Point()
-            calcDimensions.x = disDim.y * camDim.height / camDim.width
-            calcDimensions.y = disDim.y
-            return calcDimensions
-        }
-        return null
     }
 
 }
