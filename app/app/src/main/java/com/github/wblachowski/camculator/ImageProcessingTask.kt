@@ -10,20 +10,21 @@ class ImageProcessingTask : AsyncTask<Any, Void, CompleteResult>() {
 
     private var preview: ImageView? = null
     private var equationsTextView: TextView? = null
+    private var bitmap: Bitmap? = null
 
     override fun doInBackground(objects: Array<Any>): CompleteResult {
         val imageProcessor = objects[0] as ImageProcessor
         val equationIntepreter = objects[1] as EquationInterpreter
-        val bitmap = objects[2] as Bitmap
+        bitmap = objects[2] as Bitmap
         preview = objects[3] as ImageView
         equationsTextView = objects[4] as TextView
-        val result = imageProcessor.process(bitmap)
+        val result = imageProcessor.process(bitmap!!)
         val equations = equationIntepreter.findEquations(result.symbols)
         return CompleteResult(result, equations)
     }
 
     override fun onPostExecute(result: CompleteResult) {
-        preview!!.setImageBitmap(result.preprocessingResult.boxesImg)
+        preview!!.setImageBitmap(bitmap)
         equationsTextView!!.text = result.equations.stream().map { s -> s + '\n' }.reduce { obj, str -> obj + str }.orElse("")
     }
 }
