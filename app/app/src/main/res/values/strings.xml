@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Camculator</string>
-    <string name="loading_math">Loading math...</string>
-    <string name="loading_open_cv">Loading OpenCV...</string>
-    <string name="loading_model">Loading model...</string>
+    <string name="loading_math">Loading math…</string>
+    <string name="loading_open_cv">Loading OpenCV…</string>
+    <string name="loading_model">Loading model…</string>
     <string name="loading_failure">Failed to load the app.</string>
+    <string name="preview_description">Camera preview</string>
 </resources>
