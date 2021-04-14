@@ -8,10 +8,10 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import android.view.WindowManager
+import com.github.wblachowski.camculator.R
 import com.github.wblachowski.camculator.processing.EquationInterpreter
 import com.github.wblachowski.camculator.processing.ImageProcessingTask
 import com.github.wblachowski.camculator.processing.ImageProcessor
-import com.github.wblachowski.camculator.R
 import com.github.wblachowski.camculator.view.CameraSurfaceView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         cameraSurfaceView = CameraSurfaceView(this, camera!!)
 
         val displayDim = getDisplayWH()
-        val optimalCameraPreviewDim = cameraSurfaceView!!.getOptimalPreviewSize(cameraSurfaceView!!.prSupportedPreviewSizes,
+        val optimalCameraPreviewDim = cameraSurfaceView!!.getOptimalPreviewSize(
                 displayDim!!.y, displayDim.x)
         layoutPreviewDim = calcCamPrevDimensions(displayDim, optimalCameraPreviewDim!!)
         if (layoutPreviewDim != null) {
@@ -66,8 +66,8 @@ class MainActivity : AppCompatActivity() {
         val out = ByteArrayOutputStream()
         val yuvImage = YuvImage(data, parameters.previewFormat, parameters.previewSize.width, parameters.previewSize.height, null)
 
-        val factor = layoutPreviewDim!!.y.toFloat()/parameters.previewSize.width
-        val rec =  Rect( (cropRectangle.left/factor).roundToInt(),120+(cropRectangle.top/factor).roundToInt(), (cropRectangle.right/factor).roundToInt(),120+(cropRectangle.bottom/factor).roundToInt() )
+        val factor = layoutPreviewDim!!.y.toFloat() / parameters.previewSize.width
+        val rec = Rect((cropRectangle.left / factor).roundToInt(), 120 + (cropRectangle.top / factor).roundToInt(), (cropRectangle.right / factor).roundToInt(), 120 + (cropRectangle.bottom / factor).roundToInt())
         yuvImage.compressToJpeg(rec, 90, out)
         val imageBytes = out.toByteArray()
         var bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         if (camera == null) {
             camera = getCameraInstance()
-            cameraSurfaceView?.setCamera(camera!!)
+            cameraSurfaceView?.camera = camera!!
         }
     }
 

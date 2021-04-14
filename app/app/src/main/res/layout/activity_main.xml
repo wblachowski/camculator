@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="400dp"
             android:textSize="20sp"
             android:textStyle="bold" />
     </RelativeLayout>

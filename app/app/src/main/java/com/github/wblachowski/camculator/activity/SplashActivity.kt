@@ -7,15 +7,14 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import android.view.WindowManager
-import com.github.wblachowski.camculator.processing.EquationInterpreter
 import com.github.wblachowski.camculator.R
+import com.github.wblachowski.camculator.processing.EquationInterpreter
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_splash.*
 import org.matheclipse.core.expression.F
 import org.opencv.android.OpenCVLoader
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 
 class SplashActivity : AppCompatActivity() {
 
@@ -33,9 +32,8 @@ class SplashActivity : AppCompatActivity() {
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
             askForCameraPermission()
         } else {
-            statusTextView.text = "Failed to load the app"
+            setStatus(R.string.loading_failure)
         }
-
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -49,40 +47,43 @@ class SplashActivity : AppCompatActivity() {
     private fun initialize() {
         initialized = true
         Thread {
-            runOnUiThread { statusTextView.text = "Loading math..." }
             try {
-                F.await()
-            } catch (e: InterruptedException) {
-                e.printStackTrace()
+                loadMath()
+                loadOpenCv()
+                loadModel()
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                setStatus(R.string.loading_failure)
             }
-
-            runOnUiThread { statusTextView.text = "Loading openCV..." }
-            OpenCVLoader.initDebug()
-
-            runOnUiThread { statusTextView.text = "Loading model..." }
-            val file = File(this.filesDir.toString() + File.separator + "model.tflite")
-            try {
-                val inputStream = resources.openRawResource(R.raw.model)
-                val fileOutputStream = FileOutputStream(file)
-
-                val buf = ByteArray(1024)
-                var len = inputStream.read(buf)
-                while (len > 0) {
-                    fileOutputStream.write(buf, 0, len)
-                    len = inputStream.read(buf)
-                }
-
-
-                fileOutputStream.close()
-                inputStream.close()
-            } catch (e1: IOException) {
-                e1.printStackTrace()
-            }
-            EquationInterpreter.init(file)
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
         }.start()
+    }
 
+    private fun loadMath() {
+        setStatus(R.string.loading_math)
+        F.await()
+    }
+
+    private fun loadOpenCv() {
+        setStatus(R.string.loading_open_cv)
+        OpenCVLoader.initDebug()
+    }
+
+    private fun loadModel() {
+        setStatus(R.string.loading_model)
+        val file = File(this.filesDir.toString() + File.separator + "model.tflite")
+        val inputStream = resources.openRawResource(R.raw.model)
+        val fileOutputStream = FileOutputStream(file)
+        val buf = ByteArray(1024)
+        var len = inputStream.read(buf)
+        while (len > 0) {
+            fileOutputStream.write(buf, 0, len)
+            len = inputStream.read(buf)
+        }
+        fileOutputStream.close()
+        inputStream.close()
+        EquationInterpreter.init(file)
     }
 
     private fun askForCameraPermission() {
@@ -91,8 +92,10 @@ class SplashActivity : AppCompatActivity() {
                 .subscribe { granted ->
                     hasPermission = granted
                     if (!granted) {
-                        runOnUiThread { statusTextView.text = "Failed to load the app" }
+                        setStatus(R.string.loading_failure)
                     }
-                }
+                }.dispose()
     }
+
+    private fun setStatus(messageReference: Int) = runOnUiThread { statusTextView.text = getString(messageReference) }
 }
