@@ -20,11 +20,11 @@ import java.io.IOException
 class MainActivity : AppCompatActivity() {
 
     private var camera: Camera? = null
-    private var cameraSurfaceView: CameraSurfaceView? = null
+    private lateinit var cameraSurfaceView: CameraSurfaceView
+    private lateinit var cameraPreviewDim: Point
     private var equationInterpreter = EquationInterpreter.getInstance()
     private var cropRectangle = Rect()
     private val imageProcessor = ImageProcessor()
-    private var layoutPreviewDim: Point? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,18 +36,13 @@ class MainActivity : AppCompatActivity() {
 
         camera = getCameraInstance()
         cameraSurfaceView = CameraSurfaceView(this, camera!!)
-
-        val displayDim = getDisplayWH()
-        val optimalCameraPreviewDim = cameraSurfaceView!!.getOptimalPreviewSize(
-                displayDim!!.y, displayDim.x)
-        layoutPreviewDim = calcCamPrevDimensions(displayDim, optimalCameraPreviewDim!!)
-        if (layoutPreviewDim != null) {
-            val layoutPreviewParams = cameraPreview.layoutParams
-            layoutPreviewParams.width = layoutPreviewDim!!.x
-            layoutPreviewParams.height = layoutPreviewDim!!.y
-            cameraPreview.layoutParams = layoutPreviewParams
-        }
         cameraPreview.addView(cameraSurfaceView)
+
+        cameraPreviewDim = calcCameraPreviewDimensions()
+        cameraPreview.layoutParams = cameraPreview.layoutParams.apply {
+            width = cameraPreviewDim.x
+            height = cameraPreviewDim.y
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -85,8 +80,8 @@ class MainActivity : AppCompatActivity() {
         val out = ByteArrayOutputStream()
         val yuvImage = YuvImage(data, parameters.previewFormat, parameters.previewSize.width, parameters.previewSize.height, null)
 
-        val factor = layoutPreviewDim!!.y.toFloat() / parameters.previewSize.width
-        val offset = layoutPreviewDim!!.x - parameters.previewSize.height - viewport.cornerRadius.toInt()
+        val factor = cameraPreviewDim!!.y.toFloat() / parameters.previewSize.width
+        val offset = cameraPreviewDim!!.x - parameters.previewSize.height - viewport.cornerRadius.toInt()
         val rec = Rect((cropRectangle.left / factor).toInt(), offset + (cropRectangle.top / factor).toInt(), (cropRectangle.right / factor).toInt(), offset + (cropRectangle.bottom / factor).toInt())
         yuvImage.compressToJpeg(rec, 90, out)
         val imageBytes = out.toByteArray()
@@ -108,14 +103,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun getDisplayWH() = Point().apply(windowManager.defaultDisplay::getSize)
 
-    private fun calcCamPrevDimensions(disDim: Point, camDim: Camera.Size): Point? {
-        val widthRatio = disDim.x.toDouble() / camDim.height
-        val heightRatio = disDim.y.toDouble() / camDim.width
+    private fun calcCameraPreviewDimensions(): Point {
+        val displayDim = getDisplayWH()
+        val cameraDim = cameraSurfaceView.getOptimalPreviewSize(displayDim.y, displayDim.x)!!
+        val widthRatio = displayDim.x.toDouble() / cameraDim.height
+        val heightRatio = displayDim.y.toDouble() / cameraDim.width
         return if (widthRatio >= heightRatio) {
-            Point(disDim.x, disDim.x * camDim.width / camDim.height)
+            Point(displayDim.x, displayDim.x * cameraDim.width / cameraDim.height)
         } else {
-            Point(disDim.y * camDim.height / camDim.width, disDim.y)
+            Point(displayDim.y * cameraDim.height / cameraDim.width, displayDim.y)
         }
     }
-
 }
