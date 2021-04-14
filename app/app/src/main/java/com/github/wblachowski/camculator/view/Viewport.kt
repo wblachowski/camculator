@@ -25,7 +25,7 @@ class Viewport @JvmOverloads constructor(context: Context?, attrs: AttributeSet?
         val margin = pixelConverter.fromDp(MARGIN_DP)
         val cornerRadius = pixelConverter.fromDp(CORNER_RADIUS_DP)
         val width = width.toFloat() - margin
-        val height = width * 0.7f
+        val height = width * HEIGHT_WIDTH_RATIO
         rectangle = RectF(margin, margin, width, height)
 
         val path = Path().apply {
@@ -48,8 +48,9 @@ class Viewport @JvmOverloads constructor(context: Context?, attrs: AttributeSet?
     }
 
     companion object {
+        const val MARGIN_DP = 16
         const val CORNER_RADIUS_DP = 4
         const val STROKE_WIDTH = 4f
-        const val MARGIN_DP = 16
+        const val HEIGHT_WIDTH_RATIO = 0.7f
     }
 }
