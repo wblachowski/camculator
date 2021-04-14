@@ -1,6 +1,7 @@
 package com.github.wblachowski.camculator.processing
 
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.os.AsyncTask
 import android.widget.ImageView
 import android.widget.TextView
@@ -18,13 +19,14 @@ class ImageProcessingTask : AsyncTask<Any, Void, CompleteResult>() {
         bitmap = objects[2] as Bitmap
         preview = objects[3] as ImageView
         equationsTextView = objects[4] as TextView
-        val result = imageProcessor.process(bitmap!!)
+        val orgSize = objects[5] as Rect
+        val result = imageProcessor.process(bitmap!!, orgSize)
         val equations = equationInterpreter.findEquations(result.symbols)
         return CompleteResult(result, equations)
     }
 
     override fun onPostExecute(result: CompleteResult) {
-        preview!!.setImageBitmap(bitmap)
+        preview!!.setImageBitmap(result.preprocessingResult.boxesImg)
         equationsTextView!!.text = result.equations.stream().map { s -> s + '\n' }.reduce { obj, str -> obj + str }.orElse("")
     }
 }

@@ -11,6 +11,8 @@ class Viewport @JvmOverloads constructor(context: Context?, attrs: AttributeSet?
 
     private val pixelConverter = PixelConverter(resources.displayMetrics)
 
+    val cornerRadius = pixelConverter.fromDp(CORNER_RADIUS_DP)
+
     lateinit var rectangle: RectF
         private set
 
@@ -23,7 +25,6 @@ class Viewport @JvmOverloads constructor(context: Context?, attrs: AttributeSet?
     override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
         val margin = pixelConverter.fromDp(MARGIN_DP)
-        val cornerRadius = pixelConverter.fromDp(CORNER_RADIUS_DP)
         val width = width.toFloat() - margin
         val height = width * HEIGHT_WIDTH_RATIO
         rectangle = RectF(margin, margin, width, height)

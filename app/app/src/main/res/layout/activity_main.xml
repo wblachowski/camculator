@@ -32,13 +32,15 @@
         android:layout_weight=".5"
         android:background="#7f000000">
     </com.github.wblachowski.camculator.view.Viewport>
-    <ImageView
-        android:id="@+id/framePreview"
-        android:layout_width="1016px"
-        android:layout_height="702px"
-        android:alpha="0.6"
-        android:layout_gravity="top|center"
-        android:layout_marginTop="32px"
-        android:background="@drawable/border">
+    <RelativeLayout
+        android:id="@+id/frameWrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/framePreview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border">
     </ImageView>
+    </RelativeLayout>
 </FrameLayout>

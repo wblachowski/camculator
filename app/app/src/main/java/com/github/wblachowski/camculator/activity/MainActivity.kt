@@ -1,13 +1,12 @@
 package com.github.wblachowski.camculator.activity
 
-import android.annotation.SuppressLint
 import android.graphics.*
 import android.hardware.Camera
-import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import android.view.WindowManager
+import android.widget.FrameLayout
 import com.github.wblachowski.camculator.R
 import com.github.wblachowski.camculator.processing.EquationInterpreter
 import com.github.wblachowski.camculator.processing.ImageProcessingTask
@@ -16,7 +15,6 @@ import com.github.wblachowski.camculator.view.CameraSurfaceView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import kotlin.math.roundToInt
 
 
 class MainActivity : AppCompatActivity() {
@@ -55,7 +53,10 @@ class MainActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         val r = viewport.rectangle
-        cropRectangle = Rect(r.left.roundToInt(), r.top.roundToInt(), r.bottom.roundToInt(), r.right.roundToInt())
+        cropRectangle = Rect(r.left.toInt(), r.top.toInt(), r.bottom.toInt(), r.right.toInt())
+        val frameWrapperParams = frameWrapper.layoutParams as FrameLayout.LayoutParams
+        frameWrapperParams.setMargins(r.left.toInt(), r.left.toInt(), r.left.toInt(), r.left.toInt())
+        frameWrapper.layoutParams = frameWrapperParams
     }
 
     fun onPreviewFrame(data: ByteArray, camera: Camera) {
@@ -67,14 +68,15 @@ class MainActivity : AppCompatActivity() {
         val yuvImage = YuvImage(data, parameters.previewFormat, parameters.previewSize.width, parameters.previewSize.height, null)
 
         val factor = layoutPreviewDim!!.y.toFloat() / parameters.previewSize.width
-        val rec = Rect((cropRectangle.left / factor).roundToInt(), 120 + (cropRectangle.top / factor).roundToInt(), (cropRectangle.right / factor).roundToInt(), 120 + (cropRectangle.bottom / factor).roundToInt())
+        val offset = layoutPreviewDim!!.x - parameters.previewSize.height - viewport.cornerRadius.toInt()
+        val rec = Rect((cropRectangle.left / factor).toInt(), offset + (cropRectangle.top / factor).toInt(), (cropRectangle.right / factor).toInt(), offset + (cropRectangle.bottom / factor).toInt())
         yuvImage.compressToJpeg(rec, 90, out)
         val imageBytes = out.toByteArray()
         var bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
         val matrix = Matrix()
         matrix.postRotate(90f)
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-        ImageProcessingTask().execute(imageProcessor, equationInterpreter, bitmap, framePreview, equationsView)
+        ImageProcessingTask().execute(imageProcessor, equationInterpreter, bitmap, framePreview, equationsView, cropRectangle)
         try {
             out.flush()
             out.close()
@@ -104,18 +106,7 @@ class MainActivity : AppCompatActivity() {
         return if (camera != null) camera else Camera.open()
     }
 
-
-    @SuppressLint("NewApi")
-    private fun getDisplayWH(): Point? {
-        val display = this.windowManager.defaultDisplay
-        val displayWH = Point()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            display.getSize(displayWH)
-            return displayWH
-        }
-        displayWH[display.width] = display.height
-        return displayWH
-    }
+    private fun getDisplayWH() = Point().apply(windowManager.defaultDisplay::getSize)
 
     private fun calcCamPrevDimensions(disDim: Point, camDim: Camera.Size): Point? {
         val widthRatio = disDim.x.toDouble() / camDim.height

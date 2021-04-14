@@ -5,16 +5,16 @@ import com.github.wblachowski.camculator.processing.result.ImagePreprocessingRes
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.core.CvType.CV_8UC1
-import org.opencv.imgproc.Imgproc
 import org.opencv.imgproc.Imgproc.*
 import org.opencv.photo.Photo.fastNlMeansDenoising
 import java.util.*
+import kotlin.math.max
 
 class ImageProcessor {
     private val SCALE_FACTOR = 0.5
     var isProcessing: Boolean = false
 
-    fun process(imageBitmap: Bitmap): ImagePreprocessingResult {
+    fun process(imageBitmap: Bitmap, finalSize: android.graphics.Rect): ImagePreprocessingResult {
         isProcessing = true
         val img = Mat()
         val bmp32 = imageBitmap.copy(Bitmap.Config.ARGB_8888, true)
@@ -23,22 +23,25 @@ class ImageProcessor {
 
         resize(img, img, Size(orgSize.width * SCALE_FACTOR, orgSize.height * SCALE_FACTOR))
         val binaryImg = fetchBinaryImg(img)
-        val boxesImg = binaryImg.clone()
+        val boxesImg = Mat(binaryImg.size(), CvType.CV_8U)
+        cvtColor(boxesImg, boxesImg, COLOR_GRAY2RGBA, 4)
+        boxesImg.setTo(Scalar(.0, .0, .0, .0))
         val boxes = fetchBoxes(binaryImg, boxesImg)
         val symbols = extractSymbols(binaryImg, boxes)
 
-        resize(boxesImg, boxesImg, orgSize)
-        Utils.matToBitmap(boxesImg, bmp32)
+        resize(boxesImg, boxesImg, Size(finalSize.height().toDouble(), finalSize.width().toDouble()))
+        val boxesBitmap = Bitmap.createBitmap(boxesImg.cols(), boxesImg.rows(), Bitmap.Config.ARGB_8888)
+        Utils.matToBitmap(boxesImg, boxesBitmap)
         isProcessing = false
-        return ImagePreprocessingResult(bmp32, symbols)
+        return ImagePreprocessingResult(boxesBitmap, symbols)
     }
 
     private fun fetchBinaryImg(mat: Mat): Mat {
         val binaryImg = Mat()
-        Imgproc.cvtColor(mat, binaryImg, Imgproc.COLOR_RGB2GRAY)
+        cvtColor(mat, binaryImg, COLOR_RGB2GRAY)
         fastNlMeansDenoising(binaryImg, binaryImg, 13f, 7, 21)
 
-        var blockSize = Math.max(binaryImg.height(), binaryImg.width()) / 7
+        var blockSize = max(binaryImg.height(), binaryImg.width()) / 7
         blockSize = if (blockSize % 2 == 0) blockSize + 1 else blockSize
         adaptiveThreshold(binaryImg, binaryImg, 255.0, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, blockSize, 5.0)
         return binaryImg
@@ -71,7 +74,7 @@ class ImageProcessor {
         //Sort boxes vertically
         boxes.sortBy { it.y }
         for (box in boxes) {
-            rectangle(boxesImg, Point(box.x.toDouble(), box.y.toDouble()), Point((box.x + box.width).toDouble(), (box.y + box.height).toDouble()), Scalar(0.0, 255.0, 0.0))
+            rectangle(boxesImg, Point(box.x.toDouble(), box.y.toDouble()), Point((box.x + box.width).toDouble(), (box.y + box.height).toDouble()), Scalar(255.0, 255.0, 255.0, 255.0))
         }
         return boxes
     }
