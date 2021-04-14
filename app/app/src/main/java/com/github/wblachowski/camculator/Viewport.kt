@@ -6,12 +6,12 @@ import android.util.AttributeSet
 import android.view.ViewGroup
 
 
-class Viewport : ViewGroup {
-    constructor(context: Context?) : super(context)
-    @JvmOverloads
-    constructor(context: Context?, attrs: AttributeSet?, defStyle: Int = 0) : super(context, attrs, defStyle)
+class Viewport @JvmOverloads constructor(context: Context?, attrs: AttributeSet?, defStyle: Int = 0) : ViewGroup(context, attrs, defStyle) {
 
-    var rect: RectF? = null
+    private val pixelConverter = PixelConverter(resources.displayMetrics)
+
+    lateinit var rectangle: RectF
+        private set
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) = setMeasuredDimension(widthMeasureSpec, heightMeasureSpec)
 
@@ -21,23 +21,34 @@ class Viewport : ViewGroup {
 
     override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
-        val viewportMargin = 32
-        val viewportCornerRadius = 8
-        val eraser = Paint()
-        eraser.isAntiAlias = true
-        eraser.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-        val width = width.toFloat() - viewportMargin
-        val height = kotlin.math.ceil(width * 0.7).toFloat()
-        rect = RectF(viewportMargin.toFloat(), viewportMargin.toFloat(), width, height)
-        val frame = RectF(viewportMargin.toFloat() - 2, viewportMargin.toFloat() - 2, width + 4, height + 4)
-        val path = Path()
-        val stroke = Paint()
-        stroke.isAntiAlias = true
-        stroke.strokeWidth = 4f
-        stroke.color = Color.WHITE
-        stroke.style = Paint.Style.STROKE
-        path.addRoundRect(frame, viewportCornerRadius.toFloat(), viewportCornerRadius.toFloat(), Path.Direction.CW)
+        val margin = pixelConverter.fromDp(MARGIN_DP)
+        val cornerRadius = pixelConverter.fromDp(CORNER_RADIUS_DP)
+        val width = width.toFloat() - margin
+        val height = width * 0.7f
+        rectangle = RectF(margin, margin, width, height)
+
+        val path = Path().apply {
+            val frame = RectF(margin - cornerRadius / 2, margin - cornerRadius / 2, width + cornerRadius / 2, height + cornerRadius / 2)
+            addRoundRect(frame, cornerRadius, cornerRadius, Path.Direction.CW)
+        }
+        val stroke = Paint().apply {
+            isAntiAlias = true
+            strokeWidth = STROKE_WIDTH
+            color = Color.WHITE
+            style = Paint.Style.STROKE
+        }
+        val eraser = Paint().apply {
+            isAntiAlias = true
+            xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+        }
+
         canvas.drawPath(path, stroke)
-        canvas.drawRoundRect(rect, viewportCornerRadius.toFloat(), viewportCornerRadius.toFloat(), eraser)
+        canvas.drawRoundRect(rectangle, cornerRadius, cornerRadius, eraser)
+    }
+
+    companion object {
+        const val CORNER_RADIUS_DP = 4
+        const val STROKE_WIDTH = 4f
+        const val MARGIN_DP = 16
     }
 }

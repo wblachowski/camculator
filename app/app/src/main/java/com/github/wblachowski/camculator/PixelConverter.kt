@@ -5,11 +5,10 @@ import android.util.TypedValue
 
 class PixelConverter(private val displayMetrics: DisplayMetrics) {
 
-    fun fromDp(dp: Float) =
+    fun fromDp(dp: Number) =
             TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_DIP,
-                    dp,
+                    dp.toFloat(),
                     displayMetrics
             )
-
 }

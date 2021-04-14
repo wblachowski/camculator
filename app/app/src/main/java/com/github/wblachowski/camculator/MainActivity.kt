@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        val r = viewport.rect!!
+        val r = viewport.rectangle
         cropRectangle = Rect(r.left.roundToInt(), r.top.roundToInt(), r.bottom.roundToInt(), r.right.roundToInt())
     }
 
