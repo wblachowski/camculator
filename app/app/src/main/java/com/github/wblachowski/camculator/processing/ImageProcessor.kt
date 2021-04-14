@@ -2,6 +2,8 @@ package com.github.wblachowski.camculator.processing
 
 import android.graphics.Bitmap
 import com.github.wblachowski.camculator.processing.result.ImagePreprocessingResult
+import com.github.wblachowski.camculator.utils.ArglessSingletonHolder
+import com.github.wblachowski.camculator.utils.SingletonHolder
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.core.CvType.CV_8UC1
@@ -106,7 +108,7 @@ class ImageProcessor {
         return symbols
     }
 
-    companion object {
+    companion object : ArglessSingletonHolder<ImageProcessor>(::ImageProcessor) {
         private const val SCALE_FACTOR = 0.5
     }
 }

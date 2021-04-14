@@ -11,6 +11,7 @@ import com.github.wblachowski.camculator.R
 import com.github.wblachowski.camculator.processing.EquationInterpreter
 import com.github.wblachowski.camculator.processing.ImageProcessingTask
 import com.github.wblachowski.camculator.processing.ImageProcessor
+import com.github.wblachowski.camculator.processing.Payload
 import com.github.wblachowski.camculator.view.CameraSurfaceView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
@@ -21,9 +22,9 @@ class MainActivity : AppCompatActivity() {
     private var camera: Camera? = null
     private lateinit var cameraSurfaceView: CameraSurfaceView
     private lateinit var cameraPreviewDim: Point
-    private var equationInterpreter = EquationInterpreter.getInstance()
     private var cropRectangle = Rect()
-    private val imageProcessor = ImageProcessor()
+    private var equationInterpreter = EquationInterpreter.getInstance()
+    private val imageProcessor = ImageProcessor.getInstance()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,7 +78,8 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val bitmap = getDataBitmap(data, camera)
-        ImageProcessingTask().execute(imageProcessor, equationInterpreter, bitmap, framePreview, equationsView, cropRectangle)
+        val payload = Payload(bitmap, framePreview, equationsView, cropRectangle)
+        ImageProcessingTask().execute(payload)
     }
 
     private fun getCameraInstance() = camera ?: Camera.open()
