@@ -3,7 +3,8 @@ package com.github.wblachowski.camculator.processing
 import android.os.AsyncTask
 import com.github.wblachowski.camculator.processing.result.CompleteResult
 
-class ImageProcessingTask : AsyncTask<Any, Void, CompleteResult>() {
+
+class ImageProcessingTask(val onPostProcessing: (CompleteResult) -> Unit) : AsyncTask<Any, Void, CompleteResult>() {
 
     private lateinit var payload: Payload
     private val imageProcessor = ImageProcessor.getInstance()
@@ -16,8 +17,5 @@ class ImageProcessingTask : AsyncTask<Any, Void, CompleteResult>() {
         return CompleteResult(result, equations)
     }
 
-    override fun onPostExecute(result: CompleteResult) {
-        payload.framePreview.setImageBitmap(result.preprocessingResult.boxesImg)
-        payload.equationsView.text = result.equations.stream().map { s -> s + '\n' }.reduce { obj, str -> obj + str }.orElse("")
-    }
+    override fun onPostExecute(result: CompleteResult) = onPostProcessing(result)
 }
