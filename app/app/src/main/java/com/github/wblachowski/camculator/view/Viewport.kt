@@ -18,7 +18,7 @@ class Viewport @JvmOverloads constructor(context: Context?, attrs: AttributeSet?
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) = setMeasuredDimension(widthMeasureSpec, heightMeasureSpec)
 
-    public override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {}
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {}
 
     override fun shouldDelayChildPressedState() = false
 
