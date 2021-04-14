@@ -1,4 +1,4 @@
-package com.github.wblachowski.camculator
+package com.github.wblachowski.camculator.processing
 
 import org.opencv.core.Mat
 import org.opencv.core.Rect

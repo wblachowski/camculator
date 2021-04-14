@@ -1,10 +1,11 @@
-package com.github.wblachowski.camculator
+package com.github.wblachowski.camculator.view
 
 import android.content.ContentValues.TAG
 import android.hardware.Camera
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import com.github.wblachowski.camculator.activity.MainActivity
 
 class CameraSurfaceView(private val mainActivity: MainActivity, private var camera: Camera) : SurfaceView(mainActivity), SurfaceHolder.Callback {
 

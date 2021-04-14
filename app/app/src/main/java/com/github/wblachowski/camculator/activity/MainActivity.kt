@@ -1,4 +1,4 @@
-package com.github.wblachowski.camculator
+package com.github.wblachowski.camculator.activity
 
 import android.annotation.SuppressLint
 import android.graphics.*
@@ -8,6 +8,11 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import android.view.WindowManager
+import com.github.wblachowski.camculator.processing.EquationInterpreter
+import com.github.wblachowski.camculator.processing.ImageProcessingTask
+import com.github.wblachowski.camculator.processing.ImageProcessor
+import com.github.wblachowski.camculator.R
+import com.github.wblachowski.camculator.view.CameraSurfaceView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
 import java.io.IOException

@@ -1,5 +1,6 @@
-package com.github.wblachowski.camculator
+package com.github.wblachowski.camculator.processing
 
+import com.github.wblachowski.camculator.utils.SingletonHolder
 import org.matheclipse.core.eval.ExprEvaluator
 import org.opencv.core.Mat
 import org.opencv.core.Rect

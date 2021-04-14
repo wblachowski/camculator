@@ -1,4 +1,4 @@
-package com.github.wblachowski.camculator
+package com.github.wblachowski.camculator.utils
 
 import android.util.DisplayMetrics
 import android.util.TypedValue

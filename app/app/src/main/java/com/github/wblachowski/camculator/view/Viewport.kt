@@ -1,9 +1,10 @@
-package com.github.wblachowski.camculator
+package com.github.wblachowski.camculator.view
 
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.ViewGroup
+import com.github.wblachowski.camculator.utils.PixelConverter
 
 
 class Viewport @JvmOverloads constructor(context: Context?, attrs: AttributeSet?, defStyle: Int = 0) : ViewGroup(context, attrs, defStyle) {

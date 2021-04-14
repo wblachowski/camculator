@@ -1,4 +1,4 @@
-package com.github.wblachowski.camculator
+package com.github.wblachowski.camculator.utils
 
 open class SingletonHolder<out T: Any, in A>(creator: (A) -> T) {
     private var creator: ((A) -> T)? = creator

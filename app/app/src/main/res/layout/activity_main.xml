@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
     <RelativeLayout
         android:id="@+id/cameraPreview"
         android:layout_width="match_parent"
@@ -25,13 +25,13 @@
             android:textSize="20sp"
             android:textStyle="bold" />
     </RelativeLayout>
-    <com.github.wblachowski.camculator.Viewport
+    <com.github.wblachowski.camculator.view.Viewport
         android:id="@+id/viewport"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight=".5"
         android:background="#7f000000">
-    </com.github.wblachowski.camculator.Viewport>
+    </com.github.wblachowski.camculator.view.Viewport>
     <ImageView
         android:id="@+id/framePreview"
         android:layout_width="1016px"

@@ -1,4 +1,4 @@
-package com.github.wblachowski.camculator
+package com.github.wblachowski.camculator.processing
 
 import android.graphics.Bitmap
 import android.os.AsyncTask
@@ -14,12 +14,12 @@ class ImageProcessingTask : AsyncTask<Any, Void, CompleteResult>() {
 
     override fun doInBackground(objects: Array<Any>): CompleteResult {
         val imageProcessor = objects[0] as ImageProcessor
-        val equationIntepreter = objects[1] as EquationInterpreter
+        val equationInterpreter = objects[1] as EquationInterpreter
         bitmap = objects[2] as Bitmap
         preview = objects[3] as ImageView
         equationsTextView = objects[4] as TextView
         val result = imageProcessor.process(bitmap!!)
-        val equations = equationIntepreter.findEquations(result.symbols)
+        val equations = equationInterpreter.findEquations(result.symbols)
         return CompleteResult(result, equations)
     }
 
