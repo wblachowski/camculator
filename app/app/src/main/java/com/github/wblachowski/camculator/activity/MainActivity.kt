@@ -14,7 +14,6 @@ import com.github.wblachowski.camculator.processing.ImageProcessor
 import com.github.wblachowski.camculator.view.CameraSurfaceView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
-import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
@@ -49,9 +48,10 @@ class MainActivity : AppCompatActivity() {
         super.onWindowFocusChanged(hasFocus)
         val r = viewport.rectangle
         cropRectangle = Rect(r.left.toInt(), r.top.toInt(), r.bottom.toInt(), r.right.toInt())
-        val frameWrapperParams = frameWrapper.layoutParams as FrameLayout.LayoutParams
-        frameWrapperParams.setMargins(r.left.toInt(), r.left.toInt(), r.left.toInt(), r.left.toInt())
-        frameWrapper.layoutParams = frameWrapperParams
+        frameWrapper.layoutParams = (frameWrapper.layoutParams as FrameLayout.LayoutParams).apply {
+            val margin = r.left.toInt()
+            setMargins(margin, margin, margin, margin)
+        }
     }
 
     override fun onPause() {
@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         if (camera == null) {
             camera = getCameraInstance()
-            cameraSurfaceView?.camera = camera!!
+            cameraSurfaceView.camera = camera!!
         }
     }
 
@@ -76,27 +76,8 @@ class MainActivity : AppCompatActivity() {
         if (imageProcessor.isProcessing || equationInterpreter.isProcessing) {
             return
         }
-        val parameters = camera.parameters
-        val out = ByteArrayOutputStream()
-        val yuvImage = YuvImage(data, parameters.previewFormat, parameters.previewSize.width, parameters.previewSize.height, null)
-
-        val factor = cameraPreviewDim!!.y.toFloat() / parameters.previewSize.width
-        val offset = cameraPreviewDim!!.x - parameters.previewSize.height - viewport.cornerRadius.toInt()
-        val rec = Rect((cropRectangle.left / factor).toInt(), offset + (cropRectangle.top / factor).toInt(), (cropRectangle.right / factor).toInt(), offset + (cropRectangle.bottom / factor).toInt())
-        yuvImage.compressToJpeg(rec, 90, out)
-        val imageBytes = out.toByteArray()
-        var bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-        val matrix = Matrix()
-        matrix.postRotate(90f)
-        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        val bitmap = getDataBitmap(data, camera)
         ImageProcessingTask().execute(imageProcessor, equationInterpreter, bitmap, framePreview, equationsView, cropRectangle)
-        try {
-            out.flush()
-            out.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
     }
 
     private fun getCameraInstance() = camera ?: Camera.open()
@@ -113,5 +94,27 @@ class MainActivity : AppCompatActivity() {
         } else {
             Point(displayDim.y * cameraDim.height / cameraDim.width, displayDim.y)
         }
+    }
+
+    private fun getDataRectangle(camera: Camera): Rect {
+        val parameters = camera.parameters
+        val factor = cameraPreviewDim.y.toFloat() / parameters.previewSize.width
+        val offset = cameraPreviewDim.x - parameters.previewSize.height - viewport.cornerRadius.toInt()
+        return Rect((cropRectangle.left / factor).toInt(), offset + (cropRectangle.top / factor).toInt(), (cropRectangle.right / factor).toInt(), offset + (cropRectangle.bottom / factor).toInt())
+    }
+
+    private fun getDataBitmap(data: ByteArray, camera: Camera): Bitmap {
+        val parameters = camera.parameters
+        val out = ByteArrayOutputStream()
+        val yuvImage = YuvImage(data, parameters.previewFormat, parameters.previewSize.width, parameters.previewSize.height, null)
+        val rec = getDataRectangle(camera)
+        yuvImage.compressToJpeg(rec, 90, out)
+        val imageBytes = out.toByteArray()
+        out.flush()
+        out.close()
+        val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+        val matrix = Matrix()
+        matrix.postRotate(90f)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 }
