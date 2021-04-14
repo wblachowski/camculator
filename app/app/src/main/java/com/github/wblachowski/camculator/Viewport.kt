@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.ViewGroup
-import java.lang.Math.ceil
 
 
 class Viewport : ViewGroup {
@@ -12,16 +11,13 @@ class Viewport : ViewGroup {
     @JvmOverloads
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int = 0) : super(context, attrs, defStyle)
 
-    var rect : RectF? = null
+    var rect: RectF? = null
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        setMeasuredDimension(widthMeasureSpec, heightMeasureSpec)
-    }
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) = setMeasuredDimension(widthMeasureSpec, heightMeasureSpec)
 
     public override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {}
-    override fun shouldDelayChildPressedState(): Boolean {
-        return false
-    }
+
+    override fun shouldDelayChildPressedState() = false
 
     override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
