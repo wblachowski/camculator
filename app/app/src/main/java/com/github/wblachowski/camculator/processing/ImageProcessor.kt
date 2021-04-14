@@ -11,7 +11,6 @@ import java.util.*
 import kotlin.math.max
 
 class ImageProcessor {
-    private val SCALE_FACTOR = 0.5
     var isProcessing: Boolean = false
 
     fun process(imageBitmap: Bitmap, finalSize: android.graphics.Rect): ImagePreprocessingResult {
@@ -105,5 +104,9 @@ class ImageProcessor {
             symbols.add(Symbol(box, symbol))
         }
         return symbols
+    }
+
+    companion object {
+        private const val SCALE_FACTOR = 0.5
     }
 }
