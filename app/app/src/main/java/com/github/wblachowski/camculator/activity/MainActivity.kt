@@ -12,7 +12,7 @@ import com.github.wblachowski.camculator.processing.EquationInterpreter
 import com.github.wblachowski.camculator.processing.ImageProcessingTask
 import com.github.wblachowski.camculator.processing.ImageProcessor
 import com.github.wblachowski.camculator.processing.Payload
-import com.github.wblachowski.camculator.processing.result.CompleteResult
+import com.github.wblachowski.camculator.processing.result.ProcessingResult
 import com.github.wblachowski.camculator.view.CameraSurfaceView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
@@ -80,9 +80,9 @@ class MainActivity : AppCompatActivity() {
         }
         val bitmap = getDataBitmap(data, camera)
         val payload = Payload(bitmap, cropRectangle)
-        val onPostProcessing = { result: CompleteResult ->
-            framePreview.setImageBitmap(result.preprocessingResult.boxesImg)
-            equationsView.text = result.equations.stream().map { s -> s + '\n' }.reduce { obj, str -> obj + str }.orElse("")
+        val onPostProcessing = { result: ProcessingResult ->
+            framePreview.setImageBitmap(result.imageResult.boxesImg)
+            equationsView.text = result.equationResult.equations.stream().map { s -> s + '\n' }.reduce { obj, str -> obj + str }.orElse("")
         }
         ImageProcessingTask(onPostProcessing).execute(payload)
     }

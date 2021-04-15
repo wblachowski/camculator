@@ -1,7 +1,7 @@
 package com.github.wblachowski.camculator.processing
 
 import android.graphics.Bitmap
-import com.github.wblachowski.camculator.processing.result.ImagePreprocessingResult
+import com.github.wblachowski.camculator.processing.result.ImageProcessingResult
 import com.github.wblachowski.camculator.utils.ArglessSingletonHolder
 import org.opencv.android.Utils
 import org.opencv.core.*
@@ -14,7 +14,7 @@ import kotlin.math.max
 class ImageProcessor {
     var isProcessing: Boolean = false
 
-    fun process(imageBitmap: Bitmap, finalSize: android.graphics.Rect): ImagePreprocessingResult {
+    fun process(imageBitmap: Bitmap, finalSize: android.graphics.Rect): ImageProcessingResult {
         isProcessing = true
         val img = Mat()
         val bmp32 = imageBitmap.copy(Bitmap.Config.ARGB_8888, true)
@@ -33,7 +33,7 @@ class ImageProcessor {
         val boxesBitmap = Bitmap.createBitmap(boxesImg.cols(), boxesImg.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(boxesImg, boxesBitmap)
         isProcessing = false
-        return ImagePreprocessingResult(boxesBitmap, symbols)
+        return ImageProcessingResult(boxesBitmap, symbols)
     }
 
     private fun fetchBinaryImg(mat: Mat): Mat {

@@ -1,5 +1,6 @@
 package com.github.wblachowski.camculator.processing
 
+import com.github.wblachowski.camculator.processing.result.EquationProcessingResult
 import com.github.wblachowski.camculator.utils.SingletonHolder
 import org.matheclipse.core.eval.ExprEvaluator
 import org.opencv.core.Mat
@@ -21,7 +22,7 @@ class EquationInterpreter(model: File) {
         private set
     private val interpreter: Interpreter = Interpreter(model)
 
-    fun findEquations(symbols: List<Symbol>): List<String> {
+    fun findEquations(symbols: List<Symbol>): EquationProcessingResult {
         isProcessing = true
         val equations = getEquations(symbols)
         val result = equations.map { equation ->
@@ -47,7 +48,7 @@ class EquationInterpreter(model: File) {
         }
 
         isProcessing = false
-        return result
+        return EquationProcessingResult(result)
     }
 
     private fun getEquations(symbols: List<Symbol>): List<List<Symbol>> {
