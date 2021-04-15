@@ -12,9 +12,9 @@ class ImageProcessingTask(val onPostProcessing: (ProcessingResult) -> Unit) : As
 
     override fun doInBackground(objects: Array<Any>): ProcessingResult {
         payload = objects.first() as Payload
-        val result = imageProcessor.process(payload.bitmap, payload.cropRectangle)
-        val equations = equationInterpreter.findEquations(result.symbols)
-        return ProcessingResult(result, equations)
+        val imageResult = imageProcessor.process(payload.bitmap, payload.cropRectangle)
+        val equationResult = equationInterpreter.findEquations(imageResult.symbols)
+        return ProcessingResult(imageResult, equationResult)
     }
 
     override fun onPostExecute(result: ProcessingResult) = onPostProcessing(result)

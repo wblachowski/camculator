@@ -81,8 +81,8 @@ class MainActivity : AppCompatActivity() {
         val bitmap = getDataBitmap(data, camera)
         val payload = Payload(bitmap, cropRectangle)
         val onPostProcessing = { result: ProcessingResult ->
-            framePreview.setImageBitmap(result.imageResult.boxesImg)
-            equationsView.text = result.equationResult.equations.stream().map { s -> s + '\n' }.reduce { obj, str -> obj + str }.orElse("")
+            framePreview.setImageBitmap(result.boxesImg)
+            equationsView.text = result.equations.stream().map { s -> s + '\n' }.reduce { obj, str -> obj + str }.orElse("")
         }
         ImageProcessingTask(onPostProcessing).execute(payload)
     }
