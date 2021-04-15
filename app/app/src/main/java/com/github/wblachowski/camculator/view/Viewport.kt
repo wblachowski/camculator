@@ -30,7 +30,7 @@ class Viewport @JvmOverloads constructor(context: Context?, attrs: AttributeSet?
         rectangle = RectF(margin, margin, width, height)
 
         val path = Path().apply {
-            val frame = RectF(margin - cornerRadius / 2, margin - cornerRadius / 2, width + cornerRadius / 2, height + cornerRadius / 2)
+            val frame = RectF(margin , margin, width, height)
             addRoundRect(frame, cornerRadius, cornerRadius, Path.Direction.CW)
         }
         val stroke = Paint().apply {
@@ -51,7 +51,7 @@ class Viewport @JvmOverloads constructor(context: Context?, attrs: AttributeSet?
     companion object {
         const val MARGIN_DP = 16
         const val CORNER_RADIUS_DP = 4
-        const val STROKE_WIDTH = 4f
+        const val STROKE_WIDTH = 6f
         const val HEIGHT_WIDTH_RATIO = 0.7f
     }
 }
