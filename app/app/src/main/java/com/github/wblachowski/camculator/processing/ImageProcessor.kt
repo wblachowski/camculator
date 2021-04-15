@@ -3,7 +3,6 @@ package com.github.wblachowski.camculator.processing
 import android.graphics.Bitmap
 import com.github.wblachowski.camculator.processing.result.ImagePreprocessingResult
 import com.github.wblachowski.camculator.utils.ArglessSingletonHolder
-import com.github.wblachowski.camculator.utils.SingletonHolder
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.core.CvType.CV_8UC1
@@ -75,7 +74,7 @@ class ImageProcessor {
         //Sort boxes vertically
         boxes.sortBy { it.y }
         for (box in boxes) {
-            rectangle(boxesImg, Point(box.x.toDouble(), box.y.toDouble()), Point((box.x + box.width).toDouble(), (box.y + box.height).toDouble()), Scalar(255.0, 255.0, 255.0, 255.0),2)
+            rectangle(boxesImg, Point(box.x.toDouble(), box.y.toDouble()), Point((box.x + box.width).toDouble(), (box.y + box.height).toDouble()), Scalar(255.0, 255.0, 255.0, 255.0), 2)
         }
         return boxes
     }
