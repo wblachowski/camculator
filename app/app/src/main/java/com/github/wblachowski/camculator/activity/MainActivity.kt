@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private var cropRectangle = Rect()
     private var equationInterpreter = EquationInterpreter.getInstance()
     private val imageProcessor = ImageProcessor.getInstance()
+    private var previewEnabled = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +45,16 @@ class MainActivity : AppCompatActivity() {
         cameraPreview.layoutParams = cameraPreview.layoutParams.apply {
             width = cameraPreviewDim.x
             height = cameraPreviewDim.y
+        }
+
+        cameraTriggerButton.setOnClickListener {
+            if (previewEnabled) {
+                camera?.takePicture(null, null, this::onCameraCapture)
+                camera?.stopPreview()
+            } else {
+                camera?.startPreview()
+            }
+            previewEnabled=!previewEnabled
         }
     }
 
@@ -75,6 +86,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun onCameraCapture(data: ByteArray, camera: Camera) {
+        print("xd")
+    }
+
     fun onPreviewFrame(data: ByteArray, camera: Camera) {
         if (imageProcessor.isProcessing || equationInterpreter.isProcessing) {
             return
@@ -87,7 +102,7 @@ class MainActivity : AppCompatActivity() {
             equationsTitle.text = if (result.equationsCorrect) "Equations" else "Equations (incorrect)"
             equationsTitle.setTextColor(if (result.equationsCorrect) resources.getColor(R.color.white) else resources.getColor(R.color.red))
             solutionsView.visibility = if (result.equationsCorrect) View.VISIBLE else View.GONE
-            solutionsTextView.text = result.solutions.stream().map { "->" + it.values.map { it.first + "=" + it.second + '\n' }.reduce { obj, str -> obj + str }}.reduce { obj, str -> obj + str }.orElse("")
+            solutionsTextView.text = result.solutions.stream().map { "->" + it.values.map { it.first + "=" + it.second + '\n' }.reduce { obj, str -> obj + str } }.reduce { obj, str -> obj + str }.orElse("")
         }
         ImageProcessingTask(onPostProcessing).execute(payload)
     }
