@@ -1,6 +1,7 @@
 package com.github.wblachowski.camculator.processing
 
-import com.github.wblachowski.camculator.processing.result.EquationProcessingResult
+import com.github.wblachowski.camculator.processing.result.equation.EquationProcessingResult
+import com.github.wblachowski.camculator.processing.result.equation.Solution
 import com.github.wblachowski.camculator.utils.SingletonHolder
 import org.matheclipse.core.eval.ExprEvaluator
 import org.opencv.core.Mat
@@ -24,34 +25,37 @@ class EquationInterpreter(model: File) {
 
     fun findEquations(symbols: List<Symbol>): EquationProcessingResult {
         isProcessing = true
-        val equations = getEquations(symbols)
-        val result = equations.map { equation ->
+        val groupedSymbols = groupSymbols(symbols)
+        val equations = groupedSymbols.map { equation ->
             val labels = equation.map { symbol ->
                 val imgData = convertMatToTfLiteInput(symbol.image)
                 val probArray = Array(1) { FloatArray(LABELS.size) }
                 interpreter.run(imgData, probArray)
-                findMaxProbSymbol(probArray[0])
+                findMaxProbSymbol(probArray.first())
             }.toList()
             getStringRepresentation(labels, equation)
         }.toMutableList()
 
-        val expr = "Solve({" + result.stream().map<String> { eq -> eq.replace("=", "==") }.collect(Collectors.joining(",")) + "},{x,y,w,z})"
+        val expression = convertEquationsToExpression(equations)
+        var correctEquations = true
+        var solutions = listOf<Solution>()
         try {
-            var solution = ExprEvaluator().eval(expr).toString()
-            solution = solution.replace("Solve(", "").replace(",{x,y,w,z})", "")
-            solution = solution.substring(1, solution.length - 2)
-                    .replace("->".toRegex(), ": ").replace("\\}".toRegex(), "\n").replace("\\{".toRegex(), "")
-                    .replace("\n,".toRegex(), "\n").replace(",".toRegex(), ", ")
-            result.add('\n' + solution)
+            val solutionText = ExprEvaluator().eval(expression).toString().replace("Solve(", "").replace(",{x,y,w,z})", "")
+            solutions = solutionText.substring(2, solutionText.length - 2)
+                    .replace(",{", "")
+                    .split("}")
+                    .map { it.split(",") }
+                    .map { textSolution -> textSolution.map { it.split("->") }.map { Pair(it[0], it[1]) } }
+                    .map(::Solution)
         } catch (ex: Throwable) {
-            result.add("Incorrect equation" + if (result.size > 1) "s" else "")
+            correctEquations = false
         }
 
         isProcessing = false
-        return EquationProcessingResult(result)
+        return EquationProcessingResult(equations, correctEquations, solutions)
     }
 
-    private fun getEquations(symbols: List<Symbol>): List<List<Symbol>> {
+    private fun groupSymbols(symbols: List<Symbol>): List<List<Symbol>> {
         val symbolsCopy = symbols.toMutableList()
         val equations = mutableListOf<List<Symbol>>()
         while (symbolsCopy.isNotEmpty()) {
@@ -75,6 +79,7 @@ class EquationInterpreter(model: File) {
         }
         return equations
     }
+
 
     //Convert OpenCv Mat to TensorflowLite input
     private fun convertMatToTfLiteInput(mat: Mat): ByteBuffer {
@@ -112,13 +117,15 @@ class EquationInterpreter(model: File) {
     private fun isEquals(box1: Rect, box2: Rect) =
             abs(box1.x - box2.x) < max(box1.width, box2.width)
 
-
     private fun isPower(base: Rect, power: Rect, basePrediction: String, powerPrediction: String): Boolean {
         val illegalSymbols = listOf("+", "-", "/", "*")
         return if (illegalSymbols.contains(basePrediction) || illegalSymbols.contains(powerPrediction)) {
             false
         } else power.y < base.y && power.y + power.height < base.y + 0.5 * base.height && power.x > base.x + 0.5 * base.width
     }
+
+    private fun convertEquationsToExpression(equations: List<String>) =
+            "Solve({" + equations.stream().map<String> { eq -> eq.replace("=", "==") }.collect(Collectors.joining(",")) + "},{x,y,w,z})"
 
     companion object : SingletonHolder<EquationInterpreter, File>(::EquationInterpreter) {
         const val IMG_SIZE = 28

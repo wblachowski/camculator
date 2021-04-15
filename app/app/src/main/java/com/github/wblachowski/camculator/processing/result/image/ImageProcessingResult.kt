@@ -1,4 +1,4 @@
-package com.github.wblachowski.camculator.processing.result
+package com.github.wblachowski.camculator.processing.result.image
 
 import android.graphics.Bitmap
 

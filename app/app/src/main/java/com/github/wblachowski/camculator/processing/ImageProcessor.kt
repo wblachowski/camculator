@@ -1,7 +1,7 @@
 package com.github.wblachowski.camculator.processing
 
 import android.graphics.Bitmap
-import com.github.wblachowski.camculator.processing.result.ImageProcessingResult
+import com.github.wblachowski.camculator.processing.result.image.ImageProcessingResult
 import com.github.wblachowski.camculator.utils.ArglessSingletonHolder
 import org.opencv.android.Utils
 import org.opencv.core.*

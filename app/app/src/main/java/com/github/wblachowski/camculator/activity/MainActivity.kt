@@ -4,6 +4,7 @@ import android.graphics.*
 import android.hardware.Camera
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.FrameLayout
@@ -83,6 +84,10 @@ class MainActivity : AppCompatActivity() {
         val onPostProcessing = { result: ProcessingResult ->
             framePreview.setImageBitmap(result.boxesImg)
             equationsView.text = result.equations.stream().map { s -> s + '\n' }.reduce { obj, str -> obj + str }.orElse("")
+            equationsTitle.text = if (result.equationsCorrect) "Equations" else "Equations (incorrect)"
+            equationsTitle.setTextColor(if (result.equationsCorrect) resources.getColor(R.color.white) else resources.getColor(R.color.red))
+            solutionsView.visibility = if (result.equationsCorrect) View.VISIBLE else View.GONE
+            solutionsTextView.text = result.solutions.stream().map { "->" + it.values.map { it.first + "=" + it.second + '\n' }.reduce { obj, str -> obj + str }}.reduce { obj, str -> obj + str }.orElse("")
         }
         ImageProcessingTask(onPostProcessing).execute(payload)
     }
