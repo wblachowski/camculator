@@ -6,6 +6,9 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_MOVE
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -17,6 +20,7 @@ import com.github.wblachowski.camculator.processing.result.ProcessingResult
 import com.github.wblachowski.camculator.view.CameraSurfaceView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
+import kotlin.math.abs
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     private var previewEnabled = true
     private var processingTask: ImageProcessingTask? = null
 
+    private var dragging = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +52,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         cameraTriggerButton.setOnClickListener { onCameraTriggerClicked() }
+
+        val onTouchListener = View.OnTouchListener { view, event ->
+            val action = event.action
+            val y = event.y
+            Log.d("", action.toString())
+            if (action == ACTION_DOWN) {
+                dragging = abs(y - viewport.rectangle.bottom) < 60
+            }
+            if (action == ACTION_MOVE && dragging) {
+                processingTask?.cancel(true)
+                viewport.repaint(y)
+                val r = viewport.rectangle
+                cropRectangle = Rect(r.left.toInt(), r.top.toInt(), r.bottom.toInt(), r.right.toInt())
+                resultsView.visibility = View.INVISIBLE
+                framePreview.visibility = View.INVISIBLE
+            }
+            true
+        }
+        touchPaneView.setOnTouchListener(onTouchListener)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

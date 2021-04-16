@@ -10,6 +10,7 @@ import com.github.wblachowski.camculator.utils.PixelConverter
 class Viewport @JvmOverloads constructor(context: Context?, attrs: AttributeSet?, defStyle: Int = 0) : ViewGroup(context, attrs, defStyle) {
 
     private val pixelConverter = PixelConverter(resources.displayMetrics)
+    private var y: Float? = null
 
     val cornerRadius = pixelConverter.fromDp(CORNER_RADIUS_DP)
 
@@ -26,11 +27,11 @@ class Viewport @JvmOverloads constructor(context: Context?, attrs: AttributeSet?
         super.dispatchDraw(canvas)
         val margin = pixelConverter.fromDp(MARGIN_DP)
         val width = width.toFloat() - margin
-        val height = width * HEIGHT_WIDTH_RATIO
+        val height = y?.apply { minus(margin) } ?: width * HEIGHT_WIDTH_RATIO
         rectangle = RectF(margin, margin, width, height)
 
         val path = Path().apply {
-            val frame = RectF(margin , margin, width, height)
+            val frame = RectF(margin, margin, width, height)
             addRoundRect(frame, cornerRadius, cornerRadius, Path.Direction.CW)
         }
         val stroke = Paint().apply {
@@ -46,6 +47,11 @@ class Viewport @JvmOverloads constructor(context: Context?, attrs: AttributeSet?
 
         canvas.drawPath(path, stroke)
         canvas.drawRoundRect(rectangle, cornerRadius, cornerRadius, eraser)
+    }
+
+    fun repaint(y: Float) {
+        this.y = y
+        invalidate()
     }
 
     companion object {
