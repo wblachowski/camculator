@@ -79,7 +79,8 @@ class MainActivity : AppCompatActivity() {
 
     fun onPreviewFrame(data: ByteArray, camera: Camera) {
         if (processingTask == null || processingTask?.status == AsyncTask.Status.FINISHED) {
-            executeProcessingTask(data, camera)
+            val payload = Payload(getDataBitmapFromPreview(data, camera), cropRectangle)
+            executeProcessingTask(payload)
         }
     }
 
@@ -110,20 +111,11 @@ class MainActivity : AppCompatActivity() {
     private fun onCameraCapture(data: ByteArray, camera: Camera) {
         processingTask?.cancel(true)
         this.camera?.stopPreview()
+        val payload = Payload(getDataBitmapFromPicture(data, camera), cropRectangle)
+        executeProcessingTask(payload)
+    }
 
-        val parameters = camera.parameters
-
-        var bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
-        val factor = cameraPreviewDim.y.toFloat() / parameters.pictureSize.width
-        val offset = cameraPreviewDim.x - parameters.pictureSize.height - viewport.cornerRadius.toInt()
-        val rec = Rect((cropRectangle.left / factor).toInt(), offset + (cropRectangle.top / factor).toInt(), (cropRectangle.right / factor).toInt(), offset + (cropRectangle.bottom / factor).toInt())
-
-        bitmap = Bitmap.createBitmap(bitmap, rec.left, rec.top, rec.width(), rec.height())
-        val matrix = Matrix()
-        matrix.postRotate(90f)
-        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-
-        val payload = Payload(bitmap, cropRectangle)
+    private fun executeProcessingTask(payload: Payload) {
         val onPostProcessing = { result: ProcessingResult ->
             framePreview.setImageBitmap(result.boxesImg)
             equationsView.text = result.equations.stream().map { s -> s + '\n' }.reduce { obj, str -> obj + str }.orElse("")
@@ -135,21 +127,6 @@ class MainActivity : AppCompatActivity() {
             equationsTitle.visibility = View.VISIBLE
             equationsView.visibility = View.VISIBLE
             solutionsView.visibility = View.VISIBLE
-        }
-        processingTask = ImageProcessingTask(onPostProcessing).apply { execute(payload) }
-
-    }
-
-    private fun executeProcessingTask(data: ByteArray, camera: Camera) {
-        val bitmap = getDataBitmap(data, camera)
-        val payload = Payload(bitmap, cropRectangle)
-        val onPostProcessing = { result: ProcessingResult ->
-            framePreview.setImageBitmap(result.boxesImg)
-            equationsView.text = result.equations.stream().map { s -> s + '\n' }.reduce { obj, str -> obj + str }.orElse("")
-            equationsTitle.text = if (result.equationsCorrect) "Equations" else "Equations (incorrect)"
-            equationsTitle.setTextColor(if (result.equationsCorrect) resources.getColor(R.color.white) else resources.getColor(R.color.red))
-            solutionsView.visibility = if (result.equationsCorrect) View.VISIBLE else View.GONE
-            solutionsTextView.text = result.solutions.stream().map { "->" + it.values.map { it.first + "=" + it.second + '\n' }.reduce { obj, str -> obj + str } }.reduce { obj, str -> obj + str }.orElse("")
         }
         processingTask = ImageProcessingTask(onPostProcessing).apply { execute(payload) }
     }
@@ -180,25 +157,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getDataBitmap(data: ByteArray, camera: Camera): Bitmap {
+    private fun getDataBitmapFromPreview(data: ByteArray, camera: Camera): Bitmap {
         val parameters = camera.parameters
         val out = ByteArrayOutputStream()
         val yuvImage = YuvImage(data, parameters.previewFormat, parameters.previewSize.width, parameters.previewSize.height, null)
-        val rec = getDataRectangle(camera)
+        val rec = getDataRectangle(parameters.previewSize)
         yuvImage.compressToJpeg(rec, 90, out)
         val imageBytes = out.toByteArray()
         out.flush()
         out.close()
         val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-        val matrix = Matrix()
-        matrix.postRotate(90f)
+        val matrix = Matrix().apply { postRotate(90f) }
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
-    private fun getDataRectangle(camera: Camera): Rect {
-        val parameters = camera.parameters
-        val factor = cameraPreviewDim.y.toFloat() / parameters.previewSize.width
-        val offset = cameraPreviewDim.x - parameters.previewSize.height - viewport.cornerRadius.toInt()
+    private fun getDataBitmapFromPicture(data: ByteArray, camera: Camera): Bitmap {
+        val rec = getDataRectangle(camera.parameters.pictureSize)
+        var bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+        bitmap = Bitmap.createBitmap(bitmap, rec.left, rec.top, rec.width(), rec.height())
+        val matrix = Matrix().apply { postRotate(90f) }
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    private fun getDataRectangle(size: Camera.Size): Rect {
+        val factor = cameraPreviewDim.y.toFloat() / size.width
+        val offset = cameraPreviewDim.x - size.height - viewport.cornerRadius.toInt()
         return Rect((cropRectangle.left / factor).toInt(), offset + (cropRectangle.top / factor).toInt(), (cropRectangle.right / factor).toInt(), offset + (cropRectangle.bottom / factor).toInt())
     }
 }
