@@ -87,10 +87,7 @@ class MainActivity : AppCompatActivity() {
     private fun onCameraTriggerClicked() {
         if (previewEnabled) {
             processingTask?.cancel(true)
-            framePreview.visibility = View.INVISIBLE
-            equationsTitle.visibility = View.INVISIBLE
-            equationsView.visibility = View.INVISIBLE
-            solutionsView.visibility = View.INVISIBLE
+            resultsView.visibility = View.INVISIBLE
             val onCapture = Camera.PictureCallback { data, camera -> onCameraCapture(data, camera) }
             val onShutter = Camera.ShutterCallback { onCameraShutter() }
             camera?.enableShutterSound(true)
@@ -123,10 +120,7 @@ class MainActivity : AppCompatActivity() {
             equationsTitle.setTextColor(if (result.equationsCorrect) resources.getColor(R.color.white) else resources.getColor(R.color.red))
             solutionsView.visibility = if (result.equationsCorrect) View.VISIBLE else View.GONE
             solutionsTextView.text = result.solutions.stream().map { "->" + it.values.map { it.first + "=" + it.second + '\n' }.reduce { obj, str -> obj + str } }.reduce { obj, str -> obj + str }.orElse("")
-            framePreview.visibility = View.VISIBLE
-            equationsTitle.visibility = View.VISIBLE
-            equationsView.visibility = View.VISIBLE
-            solutionsView.visibility = View.VISIBLE
+            resultsView.visibility = View.VISIBLE
         }
         processingTask = ImageProcessingTask(onPostProcessing).apply { execute(payload) }
     }
