@@ -88,6 +88,7 @@ class MainActivity : AppCompatActivity() {
         if (previewEnabled) {
             processingTask?.cancel(true)
             resultsView.visibility = View.INVISIBLE
+            framePreview.visibility = View.INVISIBLE
             val onCapture = Camera.PictureCallback { data, camera -> onCameraCapture(data, camera) }
             val onShutter = Camera.ShutterCallback { onCameraShutter() }
             camera?.enableShutterSound(true)
@@ -121,6 +122,7 @@ class MainActivity : AppCompatActivity() {
             solutionsView.visibility = if (result.equationsCorrect) View.VISIBLE else View.GONE
             solutionsTextView.text = result.solutions.stream().map { "->" + it.values.map { it.first + "=" + it.second + '\n' }.reduce { obj, str -> obj + str } }.reduce { obj, str -> obj + str }.orElse("")
             resultsView.visibility = View.VISIBLE
+            framePreview.visibility = View.VISIBLE
         }
         processingTask = ImageProcessingTask(onPostProcessing).apply { execute(payload) }
     }
