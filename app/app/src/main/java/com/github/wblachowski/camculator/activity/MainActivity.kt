@@ -54,19 +54,21 @@ class MainActivity : AppCompatActivity() {
         cameraTriggerButton.setOnClickListener { onCameraTriggerClicked() }
 
         val onTouchListener = View.OnTouchListener { view, event ->
-            val action = event.action
-            val y = event.y
-            Log.d("", action.toString())
-            if (action == ACTION_DOWN) {
-                dragging = abs(y - viewport.rectangle.bottom) < 60
-            }
-            if (action == ACTION_MOVE && dragging) {
-                processingTask?.cancel(true)
-                viewport.repaint(y)
-                val r = viewport.rectangle
-                cropRectangle = Rect(r.left.toInt(), r.top.toInt(), r.bottom.toInt(), r.right.toInt())
-                resultsView.visibility = View.INVISIBLE
-                framePreview.visibility = View.INVISIBLE
+            if (previewEnabled) {
+                val action = event.action
+                val y = event.y
+                Log.d("", action.toString())
+                if (action == ACTION_DOWN) {
+                    dragging = abs(y - viewport.rectangle.bottom) < 60
+                }
+                if (action == ACTION_MOVE && dragging) {
+                    processingTask?.cancel(true)
+                    viewport.repaint(y)
+                    val r = viewport.rectangle
+                    cropRectangle = Rect(r.left.toInt(), r.top.toInt(), r.bottom.toInt(), r.right.toInt())
+                    resultsView.visibility = View.INVISIBLE
+                    framePreview.visibility = View.INVISIBLE
+                }
             }
             true
         }
