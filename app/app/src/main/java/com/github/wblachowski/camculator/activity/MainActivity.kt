@@ -2,16 +2,16 @@ package com.github.wblachowski.camculator.activity
 
 import android.graphics.*
 import android.hardware.Camera
+import android.os.AsyncTask
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.FrameLayout
 import com.github.wblachowski.camculator.R
-import com.github.wblachowski.camculator.processing.EquationInterpreter
 import com.github.wblachowski.camculator.processing.ImageProcessingTask
-import com.github.wblachowski.camculator.processing.ImageProcessor
 import com.github.wblachowski.camculator.processing.Payload
 import com.github.wblachowski.camculator.processing.result.ProcessingResult
 import com.github.wblachowski.camculator.view.CameraSurfaceView
@@ -25,9 +25,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraSurfaceView: CameraSurfaceView
     private lateinit var cameraPreviewDim: Point
     private var cropRectangle = Rect()
-    private var equationInterpreter = EquationInterpreter.getInstance()
-    private val imageProcessor = ImageProcessor.getInstance()
     private var previewEnabled = true
+    private var processingTask: ImageProcessingTask? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,15 +46,7 @@ class MainActivity : AppCompatActivity() {
             height = cameraPreviewDim.y
         }
 
-        cameraTriggerButton.setOnClickListener {
-            if (previewEnabled) {
-                camera?.takePicture(null, null, this::onCameraCapture)
-                camera?.stopPreview()
-            } else {
-                camera?.startPreview()
-            }
-            previewEnabled=!previewEnabled
-        }
+        cameraTriggerButton.setOnClickListener { onCameraTriggerClicked() }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -86,14 +77,61 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onCameraCapture(data: ByteArray, camera: Camera) {
-        print("xd")
+    fun onPreviewFrame(data: ByteArray, camera: Camera) {
+        if (processingTask == null || processingTask?.status == AsyncTask.Status.FINISHED) {
+            executeProcessingTask(data, camera)
+        }
     }
 
-    fun onPreviewFrame(data: ByteArray, camera: Camera) {
-        if (imageProcessor.isProcessing || equationInterpreter.isProcessing) {
-            return
+    private fun onCameraTriggerClicked() {
+        if (previewEnabled) {
+            val onCapture = Camera.PictureCallback { data, camera -> onCameraCapture(data, camera) }
+            val onShutter = Camera.ShutterCallback { onCameraShutter() }
+            camera?.enableShutterSound(true)
+            camera?.parameters?.setPictureSize(camera?.parameters?.previewSize?.width
+                    ?: 0, camera?.parameters?.previewSize?.height ?: 0)
+            camera?.takePicture(onShutter, null, onCapture)
+        } else {
+            camera?.startPreview()
         }
+        previewEnabled = !previewEnabled
+    }
+
+    private fun onCameraShutter() {
+        shutterEffectView.visibility = View.VISIBLE
+        Handler().postDelayed({ shutterEffectView.visibility = View.INVISIBLE }, 100)
+    }
+
+    private fun onCameraCapture(data: ByteArray, camera: Camera) {
+        processingTask?.cancel(true)
+        this.camera?.stopPreview()
+
+        val parameters = camera.parameters
+
+        var bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+        val factor = cameraPreviewDim.y.toFloat() / parameters.pictureSize.width
+        val offset = cameraPreviewDim.x - parameters.pictureSize.height - viewport.cornerRadius.toInt()
+        val rec = Rect((cropRectangle.left / factor).toInt(), offset + (cropRectangle.top / factor).toInt(), (cropRectangle.right / factor).toInt(), offset + (cropRectangle.bottom / factor).toInt())
+
+        bitmap = Bitmap.createBitmap(bitmap, rec.left, rec.top, rec.width(), rec.height())
+        val matrix = Matrix()
+        matrix.postRotate(90f)
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+
+        val payload = Payload(bitmap, cropRectangle)
+        val onPostProcessing = { result: ProcessingResult ->
+            framePreview.setImageBitmap(result.boxesImg)
+            equationsView.text = result.equations.stream().map { s -> s + '\n' }.reduce { obj, str -> obj + str }.orElse("")
+            equationsTitle.text = if (result.equationsCorrect) "Equations" else "Equations (incorrect)"
+            equationsTitle.setTextColor(if (result.equationsCorrect) resources.getColor(R.color.white) else resources.getColor(R.color.red))
+            solutionsView.visibility = if (result.equationsCorrect) View.VISIBLE else View.GONE
+            solutionsTextView.text = result.solutions.stream().map { "->" + it.values.map { it.first + "=" + it.second + '\n' }.reduce { obj, str -> obj + str } }.reduce { obj, str -> obj + str }.orElse("")
+        }
+        processingTask = ImageProcessingTask(onPostProcessing).apply { execute(payload) }
+
+    }
+
+    private fun executeProcessingTask(data: ByteArray, camera: Camera) {
         val bitmap = getDataBitmap(data, camera)
         val payload = Payload(bitmap, cropRectangle)
         val onPostProcessing = { result: ProcessingResult ->
@@ -104,10 +142,20 @@ class MainActivity : AppCompatActivity() {
             solutionsView.visibility = if (result.equationsCorrect) View.VISIBLE else View.GONE
             solutionsTextView.text = result.solutions.stream().map { "->" + it.values.map { it.first + "=" + it.second + '\n' }.reduce { obj, str -> obj + str } }.reduce { obj, str -> obj + str }.orElse("")
         }
-        ImageProcessingTask(onPostProcessing).execute(payload)
+        processingTask = ImageProcessingTask(onPostProcessing).apply { execute(payload) }
     }
 
-    private fun getCameraInstance() = camera ?: Camera.open()
+    private fun getCameraInstance(): Camera? {
+        if (camera == null) {
+            val camera = Camera.open()
+            camera.parameters = camera.parameters.apply {
+                setPictureSize(previewSize.width, previewSize.height)
+            }
+            camera.enableShutterSound(true)
+            return camera
+        }
+        return camera
+    }
 
     private fun getDisplayWH() = Point().apply(windowManager.defaultDisplay::getSize)
 
@@ -123,13 +171,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getDataRectangle(camera: Camera): Rect {
-        val parameters = camera.parameters
-        val factor = cameraPreviewDim.y.toFloat() / parameters.previewSize.width
-        val offset = cameraPreviewDim.x - parameters.previewSize.height - viewport.cornerRadius.toInt()
-        return Rect((cropRectangle.left / factor).toInt(), offset + (cropRectangle.top / factor).toInt(), (cropRectangle.right / factor).toInt(), offset + (cropRectangle.bottom / factor).toInt())
-    }
-
     private fun getDataBitmap(data: ByteArray, camera: Camera): Bitmap {
         val parameters = camera.parameters
         val out = ByteArrayOutputStream()
@@ -143,5 +184,12 @@ class MainActivity : AppCompatActivity() {
         val matrix = Matrix()
         matrix.postRotate(90f)
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    private fun getDataRectangle(camera: Camera): Rect {
+        val parameters = camera.parameters
+        val factor = cameraPreviewDim.y.toFloat() / parameters.previewSize.width
+        val offset = cameraPreviewDim.x - parameters.previewSize.height - viewport.cornerRadius.toInt()
+        return Rect((cropRectangle.left / factor).toInt(), offset + (cropRectangle.top / factor).toInt(), (cropRectangle.right / factor).toInt(), offset + (cropRectangle.bottom / factor).toInt())
     }
 }

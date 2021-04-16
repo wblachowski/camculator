@@ -19,12 +19,9 @@ import kotlin.math.min
 
 class EquationInterpreter(model: File) {
 
-    var isProcessing = false
-        private set
     private val interpreter: Interpreter = Interpreter(model)
 
     fun findEquations(symbols: List<Symbol>): EquationProcessingResult {
-        isProcessing = true
         val groupedSymbols = groupSymbols(symbols)
         val equations = groupedSymbols.map { equation ->
             val labels = equation.map { symbol ->
@@ -51,7 +48,6 @@ class EquationInterpreter(model: File) {
             correctEquations = false
         }
 
-        isProcessing = false
         return EquationProcessingResult(equations, correctEquations, solutions)
     }
 

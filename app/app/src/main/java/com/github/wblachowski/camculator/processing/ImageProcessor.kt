@@ -12,10 +12,8 @@ import java.util.*
 import kotlin.math.max
 
 class ImageProcessor {
-    var isProcessing: Boolean = false
 
     fun process(imageBitmap: Bitmap, finalSize: android.graphics.Rect): ImageProcessingResult {
-        isProcessing = true
         val img = Mat()
         val bmp32 = imageBitmap.copy(Bitmap.Config.ARGB_8888, true)
         Utils.bitmapToMat(bmp32, img)
@@ -32,7 +30,6 @@ class ImageProcessor {
         resize(boxesImg, boxesImg, Size(finalSize.height().toDouble(), finalSize.width().toDouble()))
         val boxesBitmap = Bitmap.createBitmap(boxesImg.cols(), boxesImg.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(boxesImg, boxesBitmap)
-        isProcessing = false
         return ImageProcessingResult(boxesBitmap, symbols)
     }
 
