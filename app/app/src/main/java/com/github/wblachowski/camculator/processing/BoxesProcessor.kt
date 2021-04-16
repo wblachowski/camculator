@@ -14,7 +14,7 @@ class BoxesProcessor {
         boxesImg.setTo(Scalar(.0, .0, .0, .0))
 
         symbols.forEach { symbol ->
-            val box = symbol.symbol.box
+            val box = symbol.box
             val textPoint = when(symbol.value){
                 "x","y","w","z"-> Point((box.x+4).toDouble(), (box.y + 15).toDouble())
                 "-" -> Point((box.x+2).toDouble(), (box.y + 10).toDouble())
