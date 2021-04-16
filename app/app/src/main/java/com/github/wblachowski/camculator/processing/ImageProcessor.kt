@@ -13,7 +13,7 @@ import kotlin.math.max
 
 class ImageProcessor {
 
-    fun process(imageBitmap: Bitmap, finalSize: android.graphics.Rect): ImageProcessingResult {
+    fun process(imageBitmap: Bitmap): ImageProcessingResult {
         val img = Mat()
         val bmp32 = imageBitmap.copy(Bitmap.Config.ARGB_8888, true)
         Utils.bitmapToMat(bmp32, img)
@@ -21,16 +21,10 @@ class ImageProcessor {
 
         resize(img, img, Size(orgSize.width * SCALE_FACTOR, orgSize.height * SCALE_FACTOR))
         val binaryImg = fetchBinaryImg(img)
-        val boxesImg = Mat(binaryImg.size(), CvType.CV_8U)
-        cvtColor(boxesImg, boxesImg, COLOR_GRAY2RGBA, 4)
-        boxesImg.setTo(Scalar(.0, .0, .0, .0))
-        val boxes = fetchBoxes(binaryImg, boxesImg)
+        val boxes = fetchBoxes(binaryImg)
         val symbols = extractSymbols(binaryImg, boxes)
 
-        resize(boxesImg, boxesImg, Size(finalSize.height().toDouble(), finalSize.width().toDouble()))
-        val boxesBitmap = Bitmap.createBitmap(boxesImg.cols(), boxesImg.rows(), Bitmap.Config.ARGB_8888)
-        Utils.matToBitmap(boxesImg, boxesBitmap)
-        return ImageProcessingResult(boxesBitmap, symbols)
+        return ImageProcessingResult(symbols, binaryImg.size())
     }
 
     private fun fetchBinaryImg(mat: Mat): Mat {
@@ -44,7 +38,7 @@ class ImageProcessor {
         return binaryImg
     }
 
-    private fun fetchBoxes(binaryImg: Mat, boxesImg: Mat): List<Rect> {
+    private fun fetchBoxes(binaryImg: Mat): List<Rect> {
         val contours = ArrayList<MatOfPoint>()
         val hierarchy = Mat()
         findContours(binaryImg, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE)
@@ -70,9 +64,9 @@ class ImageProcessor {
 
         //Sort boxes vertically
         boxes.sortBy { it.y }
-        for (box in boxes) {
-            rectangle(boxesImg, Point(box.x.toDouble(), box.y.toDouble()), Point((box.x + box.width).toDouble(), (box.y + box.height).toDouble()), Scalar(255.0, 255.0, 255.0, 255.0), 2)
-        }
+//        for (box in boxes) {
+//            rectangle(boxesImg, Point(box.x.toDouble(), box.y.toDouble()), Point((box.x + box.width).toDouble(), (box.y + box.height).toDouble()), Scalar(255.0, 255.0, 255.0, 255.0), 2)
+//        }
         return boxes
     }
 

@@ -25,7 +25,8 @@
             android:id="@+id/framePreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/preview_description" />
+            android:contentDescription="@string/preview_description"
+            android:alpha="0.6"/>
 
         <RelativeLayout
             android:layout_width="fill_parent"

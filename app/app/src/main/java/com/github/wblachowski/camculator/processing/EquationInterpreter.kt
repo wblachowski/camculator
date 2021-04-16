@@ -23,17 +23,24 @@ class EquationInterpreter(model: File) {
 
     fun findEquations(symbols: List<Symbol>): EquationProcessingResult {
         val groupedSymbols = groupSymbols(symbols)
+        val probs = mutableListOf<Pair<String, Int>>()
         val equations = groupedSymbols.map { equation ->
-            val labels = equation.map { symbol ->
+            val interpretedSymbols = mutableListOf<InterpretedSymbol>()
+            val labels = equation.mapNotNull { symbol ->
                 val imgData = convertMatToTfLiteInput(symbol.image)
                 val probArray = Array(1) { FloatArray(LABELS.size) }
                 interpreter.run(imgData, probArray)
-                findMaxProbSymbol(probArray.first())
+                val prob = probArray.first().max()?.toDouble() ?: .0
+                val label = findMaxProbSymbol(probArray.first())
+                if (prob >= .75) {
+                    interpretedSymbols.add(InterpretedSymbol(symbol, label, prob))
+                    label
+                } else null
             }.toList()
-            getStringRepresentation(labels, equation)
+            Equation(interpretedSymbols, getStringRepresentation(labels, equation))
         }.toMutableList()
 
-        val expression = convertEquationsToExpression(equations)
+        val expression = convertEquationsToExpression(equations.map { it.stringRepresentation }.toList())
         var correctEquations = true
         var solutions = listOf<Solution>()
         try {
@@ -48,6 +55,7 @@ class EquationInterpreter(model: File) {
             correctEquations = false
         }
 
+        probs.sortBy { it.second }
         return EquationProcessingResult(equations, correctEquations, solutions)
     }
 
