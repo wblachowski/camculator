@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity() {
                     layoutParams.bottomMargin = PixelConverter(resources.displayMetrics).fromDp(8).toInt()
                     linearView.layoutParams = layoutParams
                     val mathView = MathView(baseContext, null)
-                    val solutionTextToSet = "\\(\\color{white}{" + "\\begin{cases}" + solution.values.map { it.first + "=" + it.second }.joinToString("\\\\") + "\\end{cases}}\\)"
+                    val solutionTextToSet = "\\(\\color{white}{" + "\\begin{cases}" + solution.latexValues.map { it.first + "=" + it.second }.joinToString("\\\\") + "\\end{cases}}\\)"
                     mathView.text = solutionTextToSet
                     linearView.addView(mathView)
                 }

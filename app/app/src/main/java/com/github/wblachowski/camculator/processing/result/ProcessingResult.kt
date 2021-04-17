@@ -5,7 +5,7 @@ import com.github.wblachowski.camculator.processing.result.equation.EquationProc
 import com.github.wblachowski.camculator.processing.result.image.ImageProcessingResult
 
 data class ProcessingResult(private val imageResult: ImageProcessingResult, private val equationResult: EquationProcessingResult, val boxesImg: Bitmap) {
-    val equations = equationResult.equations.map { it.stringRepresentation }.toList()
+    val equations = equationResult.equations.map { it.latexStringRepresentation }.toList()
     val equationsCorrect = equationResult.correct
     val solutions = equationResult.solutions
 }
