@@ -51,12 +51,12 @@ class MainActivity : AppCompatActivity() {
         camera = getCameraInstance()
         cameraSurfaceView = CameraSurfaceView(this, camera!!)
 
+        cameraPreview.addView(cameraSurfaceView)
         cameraPreviewDim = calcCameraPreviewDimensions()
         cameraPreview.layoutParams = cameraPreview.layoutParams.apply {
             width = cameraPreviewDim.x
             height = cameraPreviewDim.y
         }
-        cameraPreview.addView(cameraSurfaceView)
 
         cameraTriggerButton.setOnClickListener { onCameraTriggerClicked() }
         touchPaneView.setOnTouchListener { view, event -> onTouchPaneClicked(view, event) }
@@ -126,13 +126,10 @@ class MainActivity : AppCompatActivity() {
     private fun onCameraTriggerClicked() {
         if (previewEnabled) {
             processingTask?.cancel(true)
-            resultsView.visibility = View.INVISIBLE
-            framePreview.visibility = View.INVISIBLE
+            hideResults()
             val onCapture = Camera.PictureCallback { data, camera -> onCameraCapture(data, camera) }
             val onShutter = Camera.ShutterCallback { onCameraShutter() }
             camera?.enableShutterSound(true)
-            camera?.parameters?.setPictureSize(camera?.parameters?.previewSize?.width
-                    ?: 0, camera?.parameters?.previewSize?.height ?: 0)
             camera?.takePicture(onShutter, null, onCapture)
         } else {
             camera?.startPreview()
@@ -155,33 +152,44 @@ class MainActivity : AppCompatActivity() {
     private fun executeProcessingTask(payload: Payload) {
         val onPostProcessing = { result: ProcessingResult ->
             framePreview.setImageBitmap(result.boxesImg)
-            val equationTextToSet = "\\(\\color{white}{\\begin{cases}" + result.equations.joinToString("\\\\") + "\\end{cases}}\\)"
-            if (equationTextToSet != equationsView.text) {
-                equationsView.text = equationTextToSet
-            }
             equationsTitle.text = if (result.equationsCorrect) "Equations" else "Equations (incorrect)"
             equationsTitle.setTextColor(if (result.equationsCorrect) resources.getColor(R.color.white) else resources.getColor(R.color.red))
             solutionsView.visibility = if (result.equationsCorrect) View.VISIBLE else View.GONE
 
+            if (result.equations != equationsView.text) {
+                equationsView.text = result.equations
+            }
             if (lastSolutions != result.solutions) {
-                solutionsHolder.removeAllViews()
-                for (solution in result.solutions) {
-                    val linearView = LinearLayout(baseContext)
-                    solutionsHolder.addView(linearView)
-                    val layoutParams = linearView.layoutParams as LinearLayout.LayoutParams
-                    layoutParams.bottomMargin = pixelConverter.fromDp(8).toInt()
-                    linearView.layoutParams = layoutParams
-                    val mathView = MathView(baseContext, null)
-                    val solutionTextToSet = "\\(\\color{white}{" + "\\begin{cases}" + solution.latexValues.map { it.first + "=" + it.second }.joinToString("\\\\") + "\\end{cases}}\\)"
-                    mathView.text = solutionTextToSet
-                    linearView.addView(mathView)
-                }
+                createSolutionViews(solutionsHolder, result.solutions)
                 lastSolutions = result.solutions
             }
-            resultsView.visibility = View.VISIBLE
-            framePreview.visibility = View.VISIBLE
+            showResults()
         }
         processingTask = ImageProcessingTask(onPostProcessing).apply { execute(payload) }
+    }
+
+    private fun createSolutionViews(solutionsHolder: LinearLayout, solutions: List<Solution>) {
+        solutionsHolder.removeAllViews()
+        solutions.forEach { solution ->
+            val linearView = LinearLayout(baseContext)
+            solutionsHolder.addView(linearView)
+            val layoutParams = linearView.layoutParams as LinearLayout.LayoutParams
+            layoutParams.bottomMargin = pixelConverter.fromDp(8).toInt()
+            linearView.layoutParams = layoutParams
+            val mathView = MathView(baseContext, null)
+            mathView.text = solution.latexStringRepresentation
+            linearView.addView(mathView)
+        }
+    }
+
+    private fun hideResults() {
+        resultsView.visibility = View.INVISIBLE
+        framePreview.visibility = View.INVISIBLE
+    }
+
+    private fun showResults() {
+        resultsView.visibility = View.VISIBLE
+        framePreview.visibility = View.VISIBLE
     }
 
     private fun getCameraInstance(): Camera? {
