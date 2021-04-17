@@ -6,9 +6,7 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import android.view.MotionEvent.ACTION_DOWN
-import android.view.MotionEvent.ACTION_MOVE
+import android.view.MotionEvent.*
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -34,11 +32,11 @@ class MainActivity : AppCompatActivity() {
     private var camera: Camera? = null
     private lateinit var cameraSurfaceView: CameraSurfaceView
     private lateinit var cameraPreviewDim: Point
+    private lateinit var pixelConverter: PixelConverter
+    private var draggingViewport = false
     private var cropRectangle = Rect()
     private var previewEnabled = true
     private var processingTask: ImageProcessingTask? = null
-
-    private var dragging = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,16 +56,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         cameraTriggerButton.setOnClickListener { onCameraTriggerClicked() }
-
+        pixelConverter = PixelConverter(resources.displayMetrics)
         val onTouchListener = View.OnTouchListener { view, event ->
-            if (previewEnabled) {
-                val action = event.action
-                val y = event.y
-                Log.d("", action.toString())
+            var consumed = true
+            val action = event.action
+            val y = event.y
+            val draggingMargin = pixelConverter.fromDp(24)
+            if (!draggingViewport && y >= viewport.rectangle.bottom + draggingMargin ) {
+                consumed = false
+            }
+            if (consumed && previewEnabled) {
                 if (action == ACTION_DOWN) {
-                    dragging = abs(y - viewport.rectangle.bottom) < 60
+                    draggingViewport = abs(y - viewport.rectangle.bottom) < draggingMargin
                 }
-                if (action == ACTION_MOVE && dragging) {
+                if (consumed && action == ACTION_MOVE && draggingViewport) {
                     processingTask?.cancel(true)
                     viewport.repaint(min(getDisplayWH().y - viewport.rectangle.left, max(2 * viewport.rectangle.left, y)))
                     val r = viewport.rectangle
@@ -75,8 +77,11 @@ class MainActivity : AppCompatActivity() {
                     resultsView.visibility = View.INVISIBLE
                     framePreview.visibility = View.INVISIBLE
                 }
+                if (action == ACTION_UP) {
+                    draggingViewport = false
+                }
             }
-            true
+            consumed
         }
         touchPaneView.setOnTouchListener(onTouchListener)
     }
@@ -164,7 +169,7 @@ class MainActivity : AppCompatActivity() {
                     val linearView = LinearLayout(baseContext)
                     solutionsHolder.addView(linearView)
                     val layoutParams = linearView.layoutParams as LinearLayout.LayoutParams
-                    layoutParams.bottomMargin = PixelConverter(resources.displayMetrics).fromDp(8).toInt()
+                    layoutParams.bottomMargin = pixelConverter.fromDp(8).toInt()
                     linearView.layoutParams = layoutParams
                     val mathView = MathView(baseContext, null)
                     val solutionTextToSet = "\\(\\color{white}{" + "\\begin{cases}" + solution.latexValues.map { it.first + "=" + it.second }.joinToString("\\\\") + "\\end{cases}}\\)"
