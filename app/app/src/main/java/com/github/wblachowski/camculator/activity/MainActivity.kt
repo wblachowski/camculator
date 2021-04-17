@@ -107,16 +107,14 @@ class MainActivity : AppCompatActivity() {
         if (previewEnabled) {
             if (action == ACTION_DOWN) {
                 draggingViewport = abs(y - viewport.rectangle.bottom) < draggingMargin
-            }
-            if (action == ACTION_MOVE && draggingViewport) {
+            } else if (action == ACTION_MOVE && draggingViewport) {
                 processingTask?.cancel(true)
                 viewport.repaint(min(getDisplayWH().y - pixelConverter.fromDp(108), max(2 * viewport.rectangle.left, y)))
                 val r = viewport.rectangle
                 cropRectangle = Rect(r.left.toInt(), r.top.toInt(), r.bottom.toInt(), r.right.toInt())
                 resultsView.visibility = View.INVISIBLE
                 framePreview.visibility = View.INVISIBLE
-            }
-            if (action == ACTION_UP) {
+            } else if (action == ACTION_UP) {
                 draggingViewport = false
             }
         }
