@@ -13,11 +13,15 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import com.github.wblachowski.camculator.R
 import com.github.wblachowski.camculator.processing.ImageProcessingTask
 import com.github.wblachowski.camculator.processing.Payload
 import com.github.wblachowski.camculator.processing.result.ProcessingResult
+import com.github.wblachowski.camculator.processing.result.equation.Solution
+import com.github.wblachowski.camculator.utils.PixelConverter
 import com.github.wblachowski.camculator.view.CameraSurfaceView
+import io.github.kexanie.library.MathView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
 import kotlin.math.abs
@@ -141,14 +145,34 @@ class MainActivity : AppCompatActivity() {
         executeProcessingTask(payload)
     }
 
+    private var lastSolutions = listOf<Solution>()
+
     private fun executeProcessingTask(payload: Payload) {
         val onPostProcessing = { result: ProcessingResult ->
             framePreview.setImageBitmap(result.boxesImg)
-            equationsView.text = result.equations.stream().map { s -> s + '\n' }.reduce { obj, str -> obj + str }.orElse("")
+            val equationTextToSet = "\\(\\color{white}{\\begin{cases}" + result.equations.joinToString("\\\\") + "\\end{cases}}\\)"
+            if (equationTextToSet != equationsView.text) {
+                equationsView.text = equationTextToSet
+            }
             equationsTitle.text = if (result.equationsCorrect) "Equations" else "Equations (incorrect)"
             equationsTitle.setTextColor(if (result.equationsCorrect) resources.getColor(R.color.white) else resources.getColor(R.color.red))
             solutionsView.visibility = if (result.equationsCorrect) View.VISIBLE else View.GONE
-            solutionsTextView.text = result.solutions.stream().map { "->" + it.values.map { it.first + "=" + it.second + '\n' }.reduce { obj, str -> obj + str } }.reduce { obj, str -> obj + str }.orElse("")
+
+            if (lastSolutions != result.solutions) {
+                solutionsHolder.removeAllViews()
+                for (solution in result.solutions) {
+                    val linearView = LinearLayout(baseContext)
+                    solutionsHolder.addView(linearView)
+                    val layoutParams = linearView.layoutParams as LinearLayout.LayoutParams
+                    layoutParams.bottomMargin = PixelConverter(resources.displayMetrics).fromDp(8).toInt()
+                    linearView.layoutParams = layoutParams
+                    val mathView = MathView(baseContext, null)
+                    val solutionTextToSet = "\\(\\color{white}{" + "\\begin{cases}" + solution.values.map { it.first + "=" + it.second }.joinToString("\\\\") + "\\end{cases}}\\)"
+                    mathView.text = solutionTextToSet
+                    linearView.addView(mathView)
+                }
+                lastSolutions = result.solutions
+            }
             resultsView.visibility = View.VISIBLE
             framePreview.visibility = View.VISIBLE
         }

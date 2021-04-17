@@ -47,4 +47,5 @@ dependencies {
     annotationProcessor 'org.apache.logging.log4j:log4j-core:2.5'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     apply plugin: 'kotlin-android-extensions'
+    compile 'io.github.kexanie.library:MathView:0.0.6'
 }

@@ -47,6 +47,7 @@ class EquationInterpreter(model: File) {
             val solutionText = ExprEvaluator().eval(expression).toString().replace("Solve(", "").replace(",{x,y,w,z})", "")
             solutions = solutionText.substring(2, solutionText.length - 2)
                     .replace(",{", "")
+                    .replace("I", "i")
                     .split("}")
                     .map { it.split(",") }
                     .map { textSolution -> textSolution.map { it.split("->") }.map { Pair(it[0], it[1]) } }
