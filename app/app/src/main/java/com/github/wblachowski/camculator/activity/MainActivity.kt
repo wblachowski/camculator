@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
             val action = event.action
             val y = event.y
             val draggingMargin = pixelConverter.fromDp(24)
-            if (!draggingViewport && y >= viewport.rectangle.bottom + draggingMargin ) {
+            if (!draggingViewport && y >= viewport.rectangle.bottom + draggingMargin) {
                 consumed = false
             }
             if (consumed && previewEnabled) {
