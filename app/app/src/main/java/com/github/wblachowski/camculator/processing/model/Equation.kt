@@ -1,4 +1,4 @@
-package com.github.wblachowski.camculator.processing
+package com.github.wblachowski.camculator.processing.model
 
 import com.github.wblachowski.camculator.utils.latexify
 

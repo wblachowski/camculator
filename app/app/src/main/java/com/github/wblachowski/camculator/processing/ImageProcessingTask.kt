@@ -1,7 +1,11 @@
 package com.github.wblachowski.camculator.processing
 
 import android.os.AsyncTask
-import com.github.wblachowski.camculator.processing.result.ProcessingResult
+import com.github.wblachowski.camculator.processing.model.Payload
+import com.github.wblachowski.camculator.processing.processor.BoxesProcessor
+import com.github.wblachowski.camculator.processing.processor.EquationInterpreter
+import com.github.wblachowski.camculator.processing.processor.ImageProcessor
+import com.github.wblachowski.camculator.processing.model.result.ProcessingResult
 import org.opencv.core.Size
 
 

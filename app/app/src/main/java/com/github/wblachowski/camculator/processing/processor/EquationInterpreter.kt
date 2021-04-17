@@ -1,7 +1,10 @@
-package com.github.wblachowski.camculator.processing
+package com.github.wblachowski.camculator.processing.processor
 
-import com.github.wblachowski.camculator.processing.result.equation.EquationProcessingResult
-import com.github.wblachowski.camculator.processing.result.equation.Solution
+import com.github.wblachowski.camculator.processing.model.Equation
+import com.github.wblachowski.camculator.processing.model.InterpretedSymbol
+import com.github.wblachowski.camculator.processing.model.Symbol
+import com.github.wblachowski.camculator.processing.model.result.equation.EquationProcessingResult
+import com.github.wblachowski.camculator.processing.model.result.equation.Solution
 import com.github.wblachowski.camculator.utils.SingletonHolder
 import org.matheclipse.core.eval.ExprEvaluator
 import org.opencv.core.Mat

@@ -1,4 +1,4 @@
-package com.github.wblachowski.camculator.processing.result.equation
+package com.github.wblachowski.camculator.processing.model.result.equation
 
 import com.github.wblachowski.camculator.utils.latexify
 

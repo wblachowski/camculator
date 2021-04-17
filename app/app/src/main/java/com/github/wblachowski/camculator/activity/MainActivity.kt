@@ -15,9 +15,9 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.github.wblachowski.camculator.R
 import com.github.wblachowski.camculator.processing.ImageProcessingTask
-import com.github.wblachowski.camculator.processing.Payload
-import com.github.wblachowski.camculator.processing.result.ProcessingResult
-import com.github.wblachowski.camculator.processing.result.equation.Solution
+import com.github.wblachowski.camculator.processing.model.Payload
+import com.github.wblachowski.camculator.processing.model.result.ProcessingResult
+import com.github.wblachowski.camculator.processing.model.result.equation.Solution
 import com.github.wblachowski.camculator.utils.PixelConverter
 import com.github.wblachowski.camculator.view.CameraSurfaceView
 import io.github.kexanie.library.MathView
@@ -112,8 +112,7 @@ class MainActivity : AppCompatActivity() {
                 viewport.repaint(min(getDisplayWH().y - pixelConverter.fromDp(108), max(2 * viewport.rectangle.left, y)))
                 val r = viewport.rectangle
                 cropRectangle = Rect(r.left.toInt(), r.top.toInt(), r.bottom.toInt(), r.right.toInt())
-                resultsView.visibility = View.INVISIBLE
-                framePreview.visibility = View.INVISIBLE
+                hideResults()
             } else if (action == ACTION_UP) {
                 draggingViewport = false
             }

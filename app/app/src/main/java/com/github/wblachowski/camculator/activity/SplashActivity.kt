@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import android.view.WindowManager
 import com.github.wblachowski.camculator.R
-import com.github.wblachowski.camculator.processing.EquationInterpreter
+import com.github.wblachowski.camculator.processing.processor.EquationInterpreter
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_splash.*
 import org.matheclipse.core.expression.F

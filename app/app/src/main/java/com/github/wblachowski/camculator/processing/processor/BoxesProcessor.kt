@@ -1,6 +1,7 @@
-package com.github.wblachowski.camculator.processing
+package com.github.wblachowski.camculator.processing.processor
 
 import android.graphics.Bitmap
+import com.github.wblachowski.camculator.processing.model.InterpretedSymbol
 import com.github.wblachowski.camculator.utils.ArglessSingletonHolder
 import org.opencv.android.Utils
 import org.opencv.core.*
