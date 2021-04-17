@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     private var draggingViewport = false
     private var cropRectangle = Rect()
     private var previewEnabled = true
+    private var lastSolutions = listOf<Solution>()
     private var processingTask: ImageProcessingTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -149,8 +150,6 @@ class MainActivity : AppCompatActivity() {
         val payload = Payload(getDataBitmapFromPicture(data, camera), cropRectangle)
         executeProcessingTask(payload)
     }
-
-    private var lastSolutions = listOf<Solution>()
 
     private fun executeProcessingTask(payload: Payload) {
         val onPostProcessing = { result: ProcessingResult ->
