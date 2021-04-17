@@ -32,7 +32,7 @@ class EquationInterpreter(model: File) {
                 interpreter.run(imgData, probArray)
                 val prob = probArray.first().max()?.toDouble() ?: .0
                 val label = findMaxProbSymbol(probArray.first())
-                if (prob >= .75) {
+                if (prob >= .5) {
                     interpretedSymbols.add(InterpretedSymbol(symbol, label, prob))
                     label
                 } else null
