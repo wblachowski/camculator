@@ -60,15 +60,20 @@
                             android:textColor="@android:color/white"
                             android:textSize="20sp" />
 
-                        <io.github.kexanie.library.MathView
-                            android:id="@+id/equationsView"
+                        <android.support.v4.widget.NestedScrollView
                             android:layout_width="match_parent"
-                            android:layout_height="100dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:textColor="@color/white"
-                            auto:engine="KaTeX"
-                            auto:text="\\(\\color{white}{\\begin{cases}1\\\\2\\\\3\\end{cases}}\\)" />
+                            android:layout_marginBottom="8dp">
 
+                            <io.github.kexanie.library.MathView
+                                android:id="@+id/equationsView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                auto:engine="KaTeX"
+                                auto:text="\\(\\color{white}{\\begin{cases}1\\\\2\\\\3\\end{cases}}\\)" />
+                        </android.support.v4.widget.NestedScrollView>
                     </LinearLayout>
 
                     <LinearLayout
