@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity() {
             }
             if (action == ACTION_MOVE && draggingViewport) {
                 processingTask?.cancel(true)
-                viewport.repaint(min(getDisplayWH().y - viewport.rectangle.left, max(2 * viewport.rectangle.left, y)))
+                viewport.repaint(min(getDisplayWH().y - pixelConverter.fromDp(108), max(2 * viewport.rectangle.left, y)))
                 val r = viewport.rectangle
                 cropRectangle = Rect(r.left.toInt(), r.top.toInt(), r.bottom.toInt(), r.right.toInt())
                 resultsView.visibility = View.INVISIBLE
