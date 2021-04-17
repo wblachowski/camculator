@@ -50,13 +50,13 @@ class MainActivity : AppCompatActivity() {
         pixelConverter = PixelConverter(resources.displayMetrics)
         camera = getCameraInstance()
         cameraSurfaceView = CameraSurfaceView(this, camera!!)
-        cameraPreview.addView(cameraSurfaceView)
 
         cameraPreviewDim = calcCameraPreviewDimensions()
         cameraPreview.layoutParams = cameraPreview.layoutParams.apply {
             width = cameraPreviewDim.x
             height = cameraPreviewDim.y
         }
+        cameraPreview.addView(cameraSurfaceView)
 
         cameraTriggerButton.setOnClickListener { onCameraTriggerClicked() }
         touchPaneView.setOnTouchListener { view, event -> onTouchPaneClicked(view, event) }
