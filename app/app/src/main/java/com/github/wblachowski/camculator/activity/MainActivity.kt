@@ -6,6 +6,7 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
+import android.view.MotionEvent
 import android.view.MotionEvent.*
 import android.view.View
 import android.view.Window
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity() {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_main)
 
+        pixelConverter = PixelConverter(resources.displayMetrics)
         camera = getCameraInstance()
         cameraSurfaceView = CameraSurfaceView(this, camera!!)
         cameraPreview.addView(cameraSurfaceView)
@@ -57,34 +59,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         cameraTriggerButton.setOnClickListener { onCameraTriggerClicked() }
-        pixelConverter = PixelConverter(resources.displayMetrics)
-        val onTouchListener = View.OnTouchListener { view, event ->
-            var consumed = true
-            val action = event.action
-            val y = event.y
-            val draggingMargin = pixelConverter.fromDp(24)
-            if (!draggingViewport && y >= viewport.rectangle.bottom + draggingMargin) {
-                consumed = false
-            }
-            if (consumed && previewEnabled) {
-                if (action == ACTION_DOWN) {
-                    draggingViewport = abs(y - viewport.rectangle.bottom) < draggingMargin
-                }
-                if (consumed && action == ACTION_MOVE && draggingViewport) {
-                    processingTask?.cancel(true)
-                    viewport.repaint(min(getDisplayWH().y - viewport.rectangle.left, max(2 * viewport.rectangle.left, y)))
-                    val r = viewport.rectangle
-                    cropRectangle = Rect(r.left.toInt(), r.top.toInt(), r.bottom.toInt(), r.right.toInt())
-                    resultsView.visibility = View.INVISIBLE
-                    framePreview.visibility = View.INVISIBLE
-                }
-                if (action == ACTION_UP) {
-                    draggingViewport = false
-                }
-            }
-            consumed
-        }
-        touchPaneView.setOnTouchListener(onTouchListener)
+        touchPaneView.setOnTouchListener { view, event -> onTouchPaneClicked(view, event) }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -120,6 +95,32 @@ class MainActivity : AppCompatActivity() {
             val payload = Payload(getDataBitmapFromPreview(data, camera), cropRectangle)
             executeProcessingTask(payload)
         }
+    }
+
+    private fun onTouchPaneClicked(view: View, event: MotionEvent): Boolean {
+        val action = event.action
+        val y = event.y
+        val draggingMargin = pixelConverter.fromDp(24)
+        if (!draggingViewport && y >= viewport.rectangle.bottom + draggingMargin) {
+            return false
+        }
+        if (previewEnabled) {
+            if (action == ACTION_DOWN) {
+                draggingViewport = abs(y - viewport.rectangle.bottom) < draggingMargin
+            }
+            if (action == ACTION_MOVE && draggingViewport) {
+                processingTask?.cancel(true)
+                viewport.repaint(min(getDisplayWH().y - viewport.rectangle.left, max(2 * viewport.rectangle.left, y)))
+                val r = viewport.rectangle
+                cropRectangle = Rect(r.left.toInt(), r.top.toInt(), r.bottom.toInt(), r.right.toInt())
+                resultsView.visibility = View.INVISIBLE
+                framePreview.visibility = View.INVISIBLE
+            }
+            if (action == ACTION_UP) {
+                draggingViewport = false
+            }
+        }
+        return true
     }
 
     private fun onCameraTriggerClicked() {
