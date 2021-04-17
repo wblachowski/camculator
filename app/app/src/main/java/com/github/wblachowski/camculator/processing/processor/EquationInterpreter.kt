@@ -26,7 +26,6 @@ class EquationInterpreter(model: File) {
 
     fun findEquations(symbols: List<Symbol>): EquationProcessingResult {
         val groupedSymbols = groupSymbols(symbols)
-        val probs = mutableListOf<Pair<String, Int>>()
         val equations = groupedSymbols.map { equation ->
             val interpretedSymbols = mutableListOf<InterpretedSymbol>()
             val labels = equation.mapNotNull { symbol ->
@@ -58,7 +57,6 @@ class EquationInterpreter(model: File) {
             correctEquations = false
         }
 
-        probs.sortBy { it.second }
         return EquationProcessingResult(equations, correctEquations, solutions)
     }
 
