@@ -20,7 +20,7 @@ import com.github.wblachowski.camculator.processing.model.result.ProcessingResul
 import com.github.wblachowski.camculator.processing.model.result.equation.Solution
 import com.github.wblachowski.camculator.utils.PixelConverter
 import com.github.wblachowski.camculator.view.CameraSurfaceView
-import io.github.kexanie.library.MathView
+import com.github.wblachowski.camculator.view.ScrollableMathView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
 import kotlin.math.abs
@@ -153,8 +153,8 @@ class MainActivity : AppCompatActivity() {
             equationsTitle.setTextColor(if (result.equationsCorrect) resources.getColor(R.color.white) else resources.getColor(R.color.red))
             solutionsView.visibility = if (result.equationsCorrect) View.VISIBLE else View.GONE
 
-            if (result.equations != equationsView.text) {
-                equationsView.text = result.equations
+            if (result.equations != equationsView.getText()) {
+                equationsView.setText(result.equations)
             }
             if (lastSolutions != result.solutions) {
                 createSolutionViews(solutionsHolder, result.solutions)
@@ -173,8 +173,8 @@ class MainActivity : AppCompatActivity() {
             val layoutParams = linearView.layoutParams as LinearLayout.LayoutParams
             layoutParams.bottomMargin = pixelConverter.fromDp(8).toInt()
             linearView.layoutParams = layoutParams
-            val mathView = MathView(baseContext, null)
-            mathView.text = solution.latexStringRepresentation
+            val mathView = ScrollableMathView(baseContext, null)
+            mathView.setText(solution.latexStringRepresentation)
             linearView.addView(mathView)
         }
     }

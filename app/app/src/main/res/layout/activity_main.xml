@@ -33,12 +33,13 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/framePreview"
-            android:layout_marginBottom="92dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="92dp">
 
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:nestedScrollingEnabled="true">
 
                 <LinearLayout
                     android:id="@+id/resultsView"
@@ -67,7 +68,7 @@
                             android:layout_marginTop="8dp"
                             android:layout_marginBottom="8dp">
 
-                            <io.github.kexanie.library.MathView
+                            <com.github.wblachowski.camculator.view.ScrollableMathView
                                 android:id="@+id/equationsView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -76,6 +77,7 @@
                                 auto:text="\\(\\color{white}{\\begin{cases}1\\\\2\\\\3\\end{cases}}\\)" />
                         </android.support.v4.widget.NestedScrollView>
                     </LinearLayout>
+
                     <LinearLayout
                         android:id="@+id/solutionsView"
                         android:layout_width="wrap_content"
