@@ -13,7 +13,7 @@
             android:id="@+id/equationsTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Equations"
+            android:text="@string/equations"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 
@@ -28,8 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
-                auto:engine="KaTeX"
-                auto:text="\\(\\color{white}{\\begin{cases}1\\\\2\\\\3\\end{cases}}\\)" />
+                auto:engine="KaTeX" />
         </android.support.v4.widget.NestedScrollView>
     </LinearLayout>
 </FrameLayout>

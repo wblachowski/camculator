@@ -5,4 +5,8 @@
     <string name="loading_model">Loading model…</string>
     <string name="loading_failure">Failed to load the app.</string>
     <string name="preview_description">Camera preview</string>
+    <string name="equations">Equations</string>
+    <string name="equations_incorrect">Equations (incorrect)</string>
+    <string name="equations_not_found">No equations found</string>
+    <string name="solutions">Solutions</string>
 </resources>
