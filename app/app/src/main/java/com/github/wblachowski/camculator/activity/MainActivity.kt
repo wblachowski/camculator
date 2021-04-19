@@ -122,7 +122,6 @@ class MainActivity : AppCompatActivity() {
             hideResults()
             val onCapture = Camera.PictureCallback { data, camera -> onCameraCapture(data, camera) }
             val onShutter = Camera.ShutterCallback { onCameraShutter() }
-            camera?.enableShutterSound(true)
             camera?.takePicture(onShutter, null, onCapture)
         } else {
             camera?.startPreview()
