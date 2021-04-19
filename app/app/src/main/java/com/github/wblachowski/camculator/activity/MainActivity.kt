@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         val onPostProcessing = { result: ProcessingResult ->
             framePreview.setImageBitmap(result.boxesImg)
             equationsView.updateEquations(result.equationResult)
-            solutionsView.updateSolutions(result.solutions, result.equationResult.correct)
+            solutionsView.updateSolutions(result.equationResult)
             showResults()
         }
         processingTask = ImageProcessingTask(onPostProcessing).apply { execute(payload) }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import com.github.wblachowski.camculator.R
+import com.github.wblachowski.camculator.processing.model.result.equation.EquationProcessingResult
 import com.github.wblachowski.camculator.processing.model.result.equation.Solution
 import com.github.wblachowski.camculator.utils.PixelConverter
 import kotlinx.android.synthetic.main.solutions_view.view.*
@@ -22,11 +23,11 @@ class SolutionsView @JvmOverloads constructor(
         pixelConverter = PixelConverter(resources.displayMetrics)
     }
 
-    fun updateSolutions(solutions: List<Solution>, equationsCorrect: Boolean) {
-        visibility = if (equationsCorrect) View.VISIBLE else View.GONE
-        if (lastSolutions != solutions) {
-            createSolutionViews(solutionsHolder, solutions)
-            lastSolutions = solutions
+    fun updateSolutions(result: EquationProcessingResult) {
+        visibility = if (result.correct) View.VISIBLE else View.GONE
+        if (lastSolutions != result.solutions) {
+            createSolutionViews(solutionsHolder, result.solutions)
+            lastSolutions = result.solutions
         }
     }
 
