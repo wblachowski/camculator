@@ -12,15 +12,12 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import com.github.wblachowski.camculator.R
 import com.github.wblachowski.camculator.processing.ImageProcessingTask
 import com.github.wblachowski.camculator.processing.model.Payload
 import com.github.wblachowski.camculator.processing.model.result.ProcessingResult
-import com.github.wblachowski.camculator.processing.model.result.equation.Solution
 import com.github.wblachowski.camculator.utils.PixelConverter
 import com.github.wblachowski.camculator.view.CameraSurfaceView
-import com.github.wblachowski.camculator.view.ScrollableMathView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
 import kotlin.math.abs
@@ -37,7 +34,6 @@ class MainActivity : AppCompatActivity() {
     private var draggingViewport = false
     private var cropRectangle = Rect()
     private var previewEnabled = true
-    private var lastSolutions = listOf<Solution>()
     private var processingTask: ImageProcessingTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -149,34 +145,11 @@ class MainActivity : AppCompatActivity() {
     private fun executeProcessingTask(payload: Payload) {
         val onPostProcessing = { result: ProcessingResult ->
             framePreview.setImageBitmap(result.boxesImg)
-            equationsTitle.text = if (result.equationsCorrect) "Equations" else "Equations (incorrect)"
-            equationsTitle.setTextColor(if (result.equationsCorrect) resources.getColor(R.color.white) else resources.getColor(R.color.red))
-            solutionsView.visibility = if (result.equationsCorrect) View.VISIBLE else View.GONE
-
-            if (result.equations != equationsView.getText()) {
-                equationsView.setText(result.equations)
-            }
-            if (lastSolutions != result.solutions) {
-                createSolutionViews(solutionsHolder, result.solutions)
-                lastSolutions = result.solutions
-            }
+            equationsView.updateEquations(result.equationResult)
+            solutionsView.updateSolutions(result.solutions, result.equationResult.correct)
             showResults()
         }
         processingTask = ImageProcessingTask(onPostProcessing).apply { execute(payload) }
-    }
-
-    private fun createSolutionViews(solutionsHolder: LinearLayout, solutions: List<Solution>) {
-        solutionsHolder.removeAllViews()
-        solutions.forEach { solution ->
-            val linearView = LinearLayout(baseContext)
-            solutionsHolder.addView(linearView)
-            val layoutParams = linearView.layoutParams as LinearLayout.LayoutParams
-            layoutParams.bottomMargin = pixelConverter.fromDp(8).toInt()
-            linearView.layoutParams = layoutParams
-            val mathView = ScrollableMathView(baseContext, null)
-            mathView.setText(solution.latexStringRepresentation)
-            linearView.addView(mathView)
-        }
     }
 
     private fun hideResults() {
