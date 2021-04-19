@@ -161,17 +161,13 @@ class MainActivity : AppCompatActivity() {
         framePreview.visibility = View.VISIBLE
     }
 
-    private fun getCameraInstance(): Camera? {
-        if (camera == null) {
-            val camera = Camera.open()
-            camera.parameters = camera.parameters.apply {
-                setPictureSize(previewSize.width, previewSize.height)
+    private fun getCameraInstance() =
+            camera ?: Camera.open().apply {
+                enableShutterSound(true)
+                parameters = parameters.apply {
+                    setPictureSize(previewSize.width, previewSize.height)
+                }
             }
-            camera.enableShutterSound(true)
-            return camera
-        }
-        return camera
-    }
 
     private fun getDisplayWH() = Point().apply(windowManager.defaultDisplay::getSize)
 
