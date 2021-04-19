@@ -86,6 +86,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() =
+            if (previewEnabled) {
+                super.onBackPressed()
+            } else {
+                camera?.startPreview()
+                previewEnabled = true
+            }
+
     fun onPreviewFrame(data: ByteArray, camera: Camera) {
         if (processingTask == null || processingTask?.status == AsyncTask.Status.FINISHED) {
             val payload = Payload(getDataBitmapFromPreview(data, camera), cropRectangle)
