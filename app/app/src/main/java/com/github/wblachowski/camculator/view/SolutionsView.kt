@@ -33,12 +33,14 @@ class SolutionsView @JvmOverloads constructor(
 
     private fun createSolutionViews(solutionsHolder: LinearLayout, solutions: List<Solution>) {
         solutionsHolder.removeAllViews()
-        solutions.forEach { solution ->
+        solutions.forEachIndexed { i, solution ->
             val linearView = LinearLayout(context)
             solutionsHolder.addView(linearView)
-            val layoutParams = linearView.layoutParams as LayoutParams
-            layoutParams.bottomMargin = pixelConverter.fromDp(8).toInt()
-            linearView.layoutParams = layoutParams
+            if (i != solutions.size - 1) {
+                linearView.layoutParams = (linearView.layoutParams as LayoutParams).apply {
+                    bottomMargin = pixelConverter.fromDp(8).toInt()
+                }
+            }
             val mathView = ScrollableMathView(context, null)
             mathView.setText(solution.latexStringRepresentation)
             linearView.addView(mathView)
