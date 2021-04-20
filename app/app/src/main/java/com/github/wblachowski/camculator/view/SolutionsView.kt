@@ -41,9 +41,10 @@ class SolutionsView @JvmOverloads constructor(
                     bottomMargin = pixelConverter.fromDp(8).toInt()
                 }
             }
-            val mathView = ScrollableMathView(context, null)
-            mathView.setText(solution.latexStringRepresentation)
-            linearView.addView(mathView)
+            ScrollableMathView(context).apply {
+                setText(solution.latexStringRepresentation)
+                linearView.addView(this)
+            }
         }
     }
 }

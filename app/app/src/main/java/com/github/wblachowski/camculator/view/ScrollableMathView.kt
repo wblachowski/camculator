@@ -12,7 +12,7 @@ import com.x5.template.providers.AndroidTemplates
 import io.github.kexanie.library.MathView
 
 
-class ScrollableMathView(context: Context?, attrs: AttributeSet?) : WebView(context, attrs) {
+class ScrollableMathView(context: Context?, attrs: AttributeSet? = null) : WebView(context, attrs) {
     private var mText: String? = null
     private var mConfig: String? = null
     private var mEngine = 0
