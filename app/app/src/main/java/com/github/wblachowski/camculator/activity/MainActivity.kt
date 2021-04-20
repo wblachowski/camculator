@@ -1,6 +1,7 @@
 package com.github.wblachowski.camculator.activity
 
-import android.graphics.*
+import android.graphics.Point
+import android.graphics.Rect
 import android.hardware.Camera
 import android.os.AsyncTask
 import android.os.Bundle
@@ -15,11 +16,12 @@ import android.widget.FrameLayout
 import com.github.wblachowski.camculator.R
 import com.github.wblachowski.camculator.processing.ImageProcessingTask
 import com.github.wblachowski.camculator.processing.model.Payload
+import com.github.wblachowski.camculator.processing.model.PicturePayload
+import com.github.wblachowski.camculator.processing.model.PreviewPayload
 import com.github.wblachowski.camculator.processing.model.result.ProcessingResult
 import com.github.wblachowski.camculator.utils.PixelConverter
 import com.github.wblachowski.camculator.view.CameraSurfaceView
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.ByteArrayOutputStream
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -97,7 +99,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onPreviewFrame(data: ByteArray, camera: Camera) {
         if (processingTask == null || processingTask?.status == AsyncTask.Status.FINISHED) {
-            val payload = Payload(getDataBitmapFromPreview(data, camera), cropRectangle)
+            val payload = PreviewPayload(data, camera, cropRectangle, getDataRectangle(camera.parameters.previewSize))
             executeProcessingTask(payload)
         }
     }
@@ -143,7 +145,7 @@ class MainActivity : AppCompatActivity() {
     private fun onCameraCapture(data: ByteArray, camera: Camera) {
         processingTask?.cancel(true)
         this.camera?.stopPreview()
-        val payload = Payload(getDataBitmapFromPicture(data, camera), cropRectangle)
+        val payload = PicturePayload(data, camera, cropRectangle, getDataRectangle(camera.parameters.pictureSize))
         executeProcessingTask(payload)
     }
 
@@ -187,28 +189,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             Point(displayDim.y * cameraDim.height / cameraDim.width, displayDim.y)
         }
-    }
-
-    private fun getDataBitmapFromPreview(data: ByteArray, camera: Camera): Bitmap {
-        val parameters = camera.parameters
-        val out = ByteArrayOutputStream()
-        val yuvImage = YuvImage(data, parameters.previewFormat, parameters.previewSize.width, parameters.previewSize.height, null)
-        val rec = getDataRectangle(parameters.previewSize)
-        yuvImage.compressToJpeg(rec, 90, out)
-        val imageBytes = out.toByteArray()
-        out.flush()
-        out.close()
-        val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-        val matrix = Matrix().apply { postRotate(90f) }
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-    }
-
-    private fun getDataBitmapFromPicture(data: ByteArray, camera: Camera): Bitmap {
-        val rec = getDataRectangle(camera.parameters.pictureSize)
-        var bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
-        bitmap = Bitmap.createBitmap(bitmap, rec.left, rec.top, rec.width(), rec.height())
-        val matrix = Matrix().apply { postRotate(90f) }
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
     private fun getDataRectangle(size: Camera.Size): Rect {
