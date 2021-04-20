@@ -19,7 +19,7 @@
     <RelativeLayout
         android:id="@+id/frameWrapper"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/framePreview"
@@ -29,11 +29,11 @@
             android:contentDescription="@string/preview_description" />
 
         <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/cameraTriggerButtonWrapper"
             android:layout_below="@+id/framePreview"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="92dp">
+            android:layout_marginTop="8dp">
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -59,26 +59,28 @@
             </ScrollView>
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/cameraTriggerButtonWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="16dp"
+            android:gravity="bottom|center">
+
+            <ImageButton
+                android:id="@+id/cameraTriggerButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#00000000"
+                android:src="@drawable/ic_camera_trigger" />
+        </RelativeLayout>
+
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/touchPaneView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom|center">
-
-        <ImageButton
-            android:id="@+id/cameraTriggerButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:background="#00000000"
-            android:src="@drawable/ic_camera_trigger" />
-    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/shutterEffectView"

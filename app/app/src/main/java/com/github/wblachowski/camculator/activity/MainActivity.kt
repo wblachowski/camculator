@@ -92,6 +92,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 camera?.startPreview()
                 previewEnabled = true
+                cameraTriggerButtonWrapper.visibility = View.VISIBLE
             }
 
     fun onPreviewFrame(data: ByteArray, camera: Camera) {
@@ -125,16 +126,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onCameraTriggerClicked() {
-        if (previewEnabled) {
-            processingTask?.cancel(true)
-            hideResults()
-            val onCapture = Camera.PictureCallback { data, camera -> onCameraCapture(data, camera) }
-            val onShutter = Camera.ShutterCallback { onCameraShutter() }
-            camera?.takePicture(onShutter, null, onCapture)
-        } else {
-            camera?.startPreview()
-        }
-        previewEnabled = !previewEnabled
+        processingTask?.cancel(true)
+        hideResults()
+        val onCapture = Camera.PictureCallback { data, camera -> onCameraCapture(data, camera) }
+        val onShutter = Camera.ShutterCallback { onCameraShutter() }
+        camera?.takePicture(onShutter, null, onCapture)
+        cameraTriggerButtonWrapper.visibility = View.GONE
+        previewEnabled = false
     }
 
     private fun onCameraShutter() {
