@@ -186,13 +186,13 @@ class MainActivity : AppCompatActivity() {
         framePreview.visibility = View.VISIBLE
     }
 
-    private fun getCameraInstance(flashMode: String = FLASH_MODE_OFF, focusMode: String = FOCUS_MODE_CONTINUOUS_PICTURE) =
+    private fun getCameraInstance() =
             camera ?: Camera.open().apply {
                 enableShutterSound(true)
                 parameters = parameters.apply {
                     setPictureSize(previewSize.width, previewSize.height)
-                    this.flashMode = flashMode
-                    this.focusMode = focusMode
+                    flashMode = FLASH_MODE_OFF
+                    focusMode = FOCUS_MODE_CONTINUOUS_PICTURE
                 }
             }
 
