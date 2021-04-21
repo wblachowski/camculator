@@ -32,13 +32,11 @@ class CameraSurfaceView(private val mainActivity: MainActivity, var camera: Came
 
     private fun startCameraPreview() {
         camera.apply {
-            parameters = camera.parameters.apply {
-                focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
-            }
             setDisplayOrientation(90)
             setPreviewCallback(mainActivity::onPreviewFrame)
             setPreviewDisplay(holder)
             startPreview()
+//            autoFocus { _, _ -> }
         }
     }
 
