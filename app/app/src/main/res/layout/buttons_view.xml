@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:background="#00000000"
+        android:contentDescription="Camera trigger button"
         android:src="@drawable/ic_camera_trigger" />
 
     <LinearLayout
@@ -26,7 +27,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginRight="44dp"
-            android:layout_marginBottom="16dp"
             android:layout_weight="1">
 
             <ImageButton
@@ -36,6 +36,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:background="#00000000"
+                android:contentDescription="Flash mode change button"
                 android:padding="12dp"
                 android:src="@drawable/ic_flash_off_white_24dp" />
         </RelativeLayout>
@@ -44,7 +45,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="44dp"
-            android:layout_marginBottom="16dp"
             android:layout_weight="1">
 
             <ImageButton
@@ -54,6 +54,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:background="#00000000"
+                android:contentDescription="Preview change button"
                 android:padding="12dp"
                 android:src="@drawable/ic_checkbox_blank_outline" />
         </RelativeLayout>
