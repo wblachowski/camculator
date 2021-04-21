@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraPreviewDim: Point
     private lateinit var pixelConverter: PixelConverter
     private var draggingViewport = false
-    private var cropRectangle = Rect()
     private var previewEnabled = true
     private var processingTask: ImageProcessingTask? = null
 
@@ -62,10 +61,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        val r = viewport.rectangle
-        cropRectangle = Rect(r.left.toInt(), r.top.toInt(), r.bottom.toInt(), r.right.toInt())
         frameWrapper.layoutParams = (frameWrapper.layoutParams as FrameLayout.LayoutParams).apply {
-            val margin = r.left.toInt()
+            val margin = viewport.rectangle.left.toInt()
             setMargins(margin, margin, margin, margin)
         }
     }
@@ -99,7 +96,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onPreviewFrame(data: ByteArray, camera: Camera) {
         if (processingTask == null || processingTask?.status == AsyncTask.Status.FINISHED) {
-            val payload = PreviewPayload(data, camera, cropRectangle, getDataRectangle(camera.parameters.previewSize))
+            val payload = PreviewPayload(data, camera, viewport.rectangle, getDataRectangle(camera.parameters.previewSize))
             executeProcessingTask(payload)
         }
     }
@@ -117,8 +114,6 @@ class MainActivity : AppCompatActivity() {
             } else if (action == ACTION_MOVE && draggingViewport) {
                 processingTask?.cancel(true)
                 viewport.repaint(min(getDisplayWH().y - pixelConverter.fromDp(108), max(2 * viewport.rectangle.left, y)))
-                val r = viewport.rectangle
-                cropRectangle = Rect(r.left.toInt(), r.top.toInt(), r.bottom.toInt(), r.right.toInt())
                 hideResults()
             } else if (action == ACTION_UP) {
                 draggingViewport = false
@@ -145,7 +140,7 @@ class MainActivity : AppCompatActivity() {
     private fun onCameraCapture(data: ByteArray, camera: Camera) {
         processingTask?.cancel(true)
         this.camera?.stopPreview()
-        val payload = PicturePayload(data, camera, cropRectangle, getDataRectangle(camera.parameters.pictureSize))
+        val payload = PicturePayload(data, camera, viewport.rectangle, getDataRectangle(camera.parameters.pictureSize))
         executeProcessingTask(payload)
     }
 
@@ -193,7 +188,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getDataRectangle(size: Camera.Size): Rect {
         val factor = cameraPreviewDim.y.toFloat() / size.width
-        val offset = cameraPreviewDim.x - size.height - viewport.cornerRadius.toInt()
-        return Rect((cropRectangle.left / factor).toInt(), offset + (cropRectangle.top / factor).toInt(), (cropRectangle.right / factor).toInt(), offset + (cropRectangle.bottom / factor).toInt())
+        val r = viewport.rectangle
+        return Rect((r.left / factor).toInt(), (r.top / factor).toInt(), (r.right / factor).toInt(), (r.bottom / factor).toInt())
     }
 }

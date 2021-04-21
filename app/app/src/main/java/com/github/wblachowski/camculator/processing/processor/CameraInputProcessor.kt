@@ -11,21 +11,21 @@ class CameraInputProcessor {
         val parameters = camera.parameters
         val out = ByteArrayOutputStream()
         val yuvImage = YuvImage(data, parameters.previewFormat, parameters.previewSize.width, parameters.previewSize.height, null)
-        yuvImage.compressToJpeg(rec, 90, out)
+        yuvImage.compressToJpeg(Rect(0, 0, parameters.previewSize.width, parameters.previewSize.height), 90, out)
         val imageBytes = out.toByteArray()
         out.flush()
         out.close()
-        val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
         val matrix = Matrix().apply { postRotate(90f) }
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        var bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        return Bitmap.createBitmap(bitmap, rec.left, rec.top, rec.width(), rec.height())
     }
 
     fun processForPicture(data: ByteArray, rec: Rect): Bitmap {
         var bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
-        bitmap = Bitmap.createBitmap(bitmap, rec.left, rec.top, rec.width(), rec.height())
         val matrix = Matrix().apply { postRotate(90f) }
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        return Bitmap.createBitmap(bitmap, rec.left, rec.top, rec.width(), rec.height())
     }
 
     companion object : ArglessSingletonHolder<CameraInputProcessor>(::CameraInputProcessor)

@@ -26,7 +26,7 @@ class ImageProcessingTask(val onPostProcessing: (ProcessingResult) -> Any) : Asy
         val equationResult = equationInterpreter.findEquations(imageResult.symbols)
         val finalSize = Size(payload.cropRectangle.width().toDouble(), payload.cropRectangle.height().toDouble())
         val boxesBitmap = boxesProcessor.process(equationResult.equations.flatMap { it.symbols }, imageResult.size, finalSize)
-        return ProcessingResult(imageResult, equationResult, boxesBitmap)
+        return ProcessingResult(equationResult, boxesBitmap)
     }
 
     private fun getDataBitmap(payload: Payload) = if (payload is PreviewPayload) {
