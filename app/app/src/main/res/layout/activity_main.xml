@@ -31,7 +31,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/cameraTriggerButtonWrapper"
+            android:layout_above="@+id/buttonsView"
             android:layout_below="@+id/framePreview"
             android:layout_marginTop="8dp">
 
@@ -63,8 +63,8 @@
         <com.github.wblachowski.camculator.view.ButtonsView
             android:id="@+id/buttonsView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="bottom|center" />
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"/>
     </RelativeLayout>
 
     <RelativeLayout
