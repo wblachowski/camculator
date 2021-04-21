@@ -3,7 +3,8 @@ package com.github.wblachowski.camculator.activity
 import android.graphics.Point
 import android.graphics.Rect
 import android.hardware.Camera
-import android.hardware.Camera.Parameters.*
+import android.hardware.Camera.Parameters.FLASH_MODE_OFF
+import android.hardware.Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
@@ -36,10 +37,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pixelConverter: PixelConverter
     private var draggingViewport = false
     private var previewEnabled = true
-    private var processingTask: ImageProcessingTask? = null
-    private val flashModes = listOf(Pair(FLASH_MODE_OFF, R.drawable.ic_flash_off_white_24dp), Pair(FLASH_MODE_AUTO, R.drawable.ic_flash_auto_white_24dp), Pair(FLASH_MODE_ON, R.drawable.ic_flash_on_white_24dp), Pair(FLASH_MODE_TORCH, R.drawable.ic_flash_torch_white_24dp))
-    private var currentFlashMode = 0
     private var resultsVisible = true
+    private var processingTask: ImageProcessingTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,31 +58,10 @@ class MainActivity : AppCompatActivity() {
             height = cameraPreviewDim.y
         }
 
-        cameraTriggerButton.setOnClickListener { onCameraTriggerClicked() }
         touchPaneView.setOnTouchListener { view, event -> onTouchPaneClicked(view, event) }
-        flashButton.setOnClickListener {
-            currentFlashMode = (currentFlashMode + 1) % flashModes.size
-            val newFlashMode = flashModes[currentFlashMode]
-            camera?.parameters = camera?.parameters?.apply {
-                flashMode = newFlashMode.first
-            }
-            flashButton.setImageDrawable(getDrawable(newFlashMode.second))
-        }
-        previewButton.setOnClickListener {
-            resultsVisible = !resultsVisible
-            onResultsVisibleChanged(resultsVisible)
-            val newDrawable = if (resultsVisible) R.drawable.ic_checkbox_blank_outline else R.drawable.ic_checkbox_blank_off_outline
-            previewButton.setImageDrawable(getDrawable(newDrawable))
-        }
-    }
-
-    private fun onResultsVisibleChanged(previewButtonEnabled: Boolean) {
-        if (previewButtonEnabled) {
-            showResults()
-        } else {
-            processingTask?.cancel(true)
-            hideResults()
-        }
+        buttonsView.onFlashButtonClicked = this::onFlashButtonClicked
+        buttonsView.onPreviewButtonClicked = this::onResultsVisibleChanged
+        buttonsView.onCameraButtonClicked = this::onCameraTriggerClicked
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -118,7 +96,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 camera?.startPreview()
                 previewEnabled = true
-                cameraTriggerButtonWrapper.visibility = View.VISIBLE
+                buttonsView.show()
                 onResultsVisibleChanged(resultsVisible)
             }
 
@@ -126,6 +104,22 @@ class MainActivity : AppCompatActivity() {
         if (resultsVisible && (processingTask == null || processingTask?.status == AsyncTask.Status.FINISHED)) {
             val payload = PreviewPayload(data, camera, viewport.rectangle, getDataRectangle(camera.parameters.previewSize))
             executeProcessingTask(payload)
+        }
+    }
+
+    private fun onFlashButtonClicked(mode: String) {
+        camera?.parameters = camera?.parameters?.apply {
+            flashMode = mode
+        }
+    }
+
+    private fun onResultsVisibleChanged(previewButtonEnabled: Boolean) {
+        resultsVisible = previewButtonEnabled
+        if (previewButtonEnabled) {
+            showResults()
+        } else {
+            processingTask?.cancel(true)
+            hideResults()
         }
     }
 
@@ -156,7 +150,7 @@ class MainActivity : AppCompatActivity() {
         val onCapture = Camera.PictureCallback { data, camera -> onCameraCapture(data, camera) }
         val onShutter = Camera.ShutterCallback { onCameraShutter() }
         camera?.takePicture(onShutter, null, onCapture)
-        cameraTriggerButtonWrapper.visibility = View.GONE
+        buttonsView.hide()
         previewEnabled = false
     }
 

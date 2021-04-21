@@ -60,66 +60,11 @@
             </ScrollView>
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/cameraTriggerButtonWrapper"
+        <com.github.wblachowski.camculator.view.ButtonsView
+            android:id="@+id/buttonsView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="16dp"
-            android:paddingBottom="16dp"
-            android:paddingTop="16dp"
-            android:gravity="bottom|center">
-
-            <ImageButton
-                android:id="@+id/cameraTriggerButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:background="#00000000"
-                android:src="@drawable/ic_camera_trigger" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="76dp"
-                android:layout_weight="2"
-                android:orientation="horizontal">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginRight="44dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_weight="1">
-
-                    <ImageButton
-                        android:id="@+id/flashButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:background="#00000000"
-                        android:src="@drawable/ic_flash_off_white_24dp" />
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="44dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_weight="1">
-
-                    <ImageButton
-                        android:id="@+id/previewButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:background="#00000000"
-                        android:src="@drawable/ic_checkbox_blank_outline" />
-                </RelativeLayout>
-            </LinearLayout>
-        </RelativeLayout>
-
+            android:layout_height="match_parent"
+            android:gravity="bottom|center" />
     </RelativeLayout>
 
     <RelativeLayout
