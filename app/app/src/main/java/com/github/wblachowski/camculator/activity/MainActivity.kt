@@ -72,15 +72,15 @@ class MainActivity : AppCompatActivity() {
         previewButton.setOnClickListener {
             resultsVisible = !resultsVisible
             onResultsVisibleChanged(resultsVisible)
-            val newDrawable = if(resultsVisible) R.drawable.ic_checkbox_blank_outline else R.drawable.ic_checkbox_blank_off_outline
+            val newDrawable = if (resultsVisible) R.drawable.ic_checkbox_blank_outline else R.drawable.ic_checkbox_blank_off_outline
             previewButton.setImageDrawable(getDrawable(newDrawable))
         }
     }
 
     private fun onResultsVisibleChanged(previewButtonEnabled: Boolean) {
-        if(previewButtonEnabled){
+        if (previewButtonEnabled) {
             showResults()
-        }else{
+        } else {
             processingTask?.cancel(true)
             hideResults()
         }
@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
                 draggingViewport = abs(y - viewport.rectangle.bottom) < draggingMargin
             } else if (action == ACTION_MOVE && draggingViewport) {
                 processingTask?.cancel(true)
-                viewport.repaint(min(getDisplayWH().y - pixelConverter.fromDp(108), max(2 * viewport.rectangle.left, y)))
+                viewport.repaint(min(getDisplayWH().y - pixelConverter.fromDp(140), max(2 * viewport.rectangle.left, y)))
                 hideResults()
             } else if (action == ACTION_UP) {
                 draggingViewport = false
