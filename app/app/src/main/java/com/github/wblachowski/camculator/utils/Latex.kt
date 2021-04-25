@@ -15,13 +15,13 @@ private fun addExpBrackets(text: String): String {
             newText += "^{"
             opened++
         } else if (opened > 0 && char in terminating) {
-            newText += "$char}"
+            newText += "}$char"
             opened--
         } else {
             newText += char
         }
     }
-    for (i in 0 until opened) {
+    while (opened-- > 0) {
         newText += "}"
     }
     return newText
