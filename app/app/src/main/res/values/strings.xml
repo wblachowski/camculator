@@ -9,4 +9,5 @@
     <string name="equations_incorrect">Equations (incorrect)</string>
     <string name="equations_not_found">No equations found</string>
     <string name="solutions">Solutions</string>
+    <string name="camera_button_description">Camera trigger button</string>
 </resources>
