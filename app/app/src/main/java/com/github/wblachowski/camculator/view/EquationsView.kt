@@ -17,7 +17,6 @@ class EquationsView @JvmOverloads constructor(
     }
 
     fun updateEquations(result: EquationProcessingResult) {
-        equationsTitle.text = if (result.correct) "Equations" else "Equations (incorrect)"
         equationsTitle.text = when {
             result.equations.isEmpty() -> context.getString(R.string.equations_not_found)
             result.correct -> context.getString(R.string.equations)
