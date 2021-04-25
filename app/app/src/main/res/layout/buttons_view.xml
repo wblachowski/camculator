@@ -36,7 +36,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:background="#00000000"
-                android:contentDescription="Flash mode change button"
+                android:contentDescription="@string/flash_button_description"
                 android:padding="12dp"
                 android:src="@drawable/ic_flash_off_white_24dp" />
         </RelativeLayout>
@@ -54,7 +54,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:background="#00000000"
-                android:contentDescription="Preview change button"
+                android:contentDescription="@string/preview_button_description"
                 android:padding="12dp"
                 android:src="@drawable/ic_checkbox_blank_outline" />
         </RelativeLayout>

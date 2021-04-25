@@ -10,4 +10,6 @@
     <string name="equations_not_found">No equations found</string>
     <string name="solutions">Solutions</string>
     <string name="camera_button_description">Camera trigger button</string>
+    <string name="flash_button_description">Flash mode change button</string>
+    <string name="preview_button_description">Preview change button</string>
 </resources>
