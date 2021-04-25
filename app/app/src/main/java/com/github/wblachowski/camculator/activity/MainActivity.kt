@@ -167,13 +167,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun executeProcessingTask(payload: Payload) {
+        if (!previewEnabled) showSpinner()
         val onPostProcessing = { result: ProcessingResult ->
             framePreview.setImageBitmap(result.boxesImg)
             equationsView.updateEquations(result.equationResult)
             solutionsView.updateSolutions(result.equationResult)
             showResults()
+            hideSpinner()
         }
         processingTask = ImageProcessingTask(onPostProcessing).apply { execute(payload) }
+    }
+
+    private fun hideSpinner() {
+        spinnerView.visibility = View.INVISIBLE
+    }
+
+    private fun showSpinner() {
+        spinnerView.visibility = View.VISIBLE
     }
 
     private fun hideResults() {

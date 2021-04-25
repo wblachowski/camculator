@@ -13,4 +13,5 @@
     <string name="camera_button_description">Camera trigger button</string>
     <string name="flash_button_description">Flash mode change button</string>
     <string name="preview_button_description">Preview change button</string>
+    <string name="spinner_text">Crunching the numbers…</string>
 </resources>
