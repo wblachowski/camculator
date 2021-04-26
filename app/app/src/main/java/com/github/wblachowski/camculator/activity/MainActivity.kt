@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity() {
         if (!previewEnabled) showSpinner()
         val onPostProcessing = { result: ProcessingResult ->
             framePreview.setImageBitmap(result.boxesImg)
-            equationsView.updateEquations(result.equationResult)
+            equationsView.updateEquations(result.equationResult, payload is PicturePayload)
             solutionsView.updateSolutions(result.equationResult)
             showResults()
             hideSpinner()
@@ -190,7 +190,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun hideResults() {
-        resultsView.visibility = View.INVISIBLE
+        resultsView.visibility = View.GONE
         framePreview.visibility = View.INVISIBLE
     }
 

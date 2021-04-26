@@ -23,11 +23,15 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp">
 
-            <com.github.wblachowski.camculator.view.ScrollableMathView
-                android:id="@+id/equationsMathView"
+            <RelativeLayout
+                android:id="@+id/equationsMathViewWrapper"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                auto:engine="KaTeX" />
+                android:layout_height="wrap_content" />
+<!--            <com.github.wblachowski.camculator.view.ScrollableMathView-->
+<!--                android:id="@+id/equationsMathView"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                auto:engine="KaTeX" />-->
         </android.support.v4.widget.NestedScrollView>
     </LinearLayout>
 </FrameLayout>
