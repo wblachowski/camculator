@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity() {
                 cameraSurfaceView.startCameraPreview()
             }
 
-    fun onPreviewFrame(data: ByteArray, camera: Camera) {
+    private fun onPreviewFrame(data: ByteArray, camera: Camera) {
         if (previewEnabled && resultsVisible && (processingTask == null || processingTask?.status == AsyncTask.Status.FINISHED)) {
             val payload = PreviewPayload(data, camera, viewport.rectangle, getDataRectangle(camera.parameters.previewSize))
             executeProcessingTask(payload)
