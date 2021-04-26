@@ -6,7 +6,7 @@ import android.view.SurfaceView
 import com.github.wblachowski.camculator.activity.MainActivity
 import kotlin.math.abs
 
-class CameraSurfaceView(private val mainActivity: MainActivity, var camera: Camera) : SurfaceView(mainActivity), SurfaceHolder.Callback {
+class CameraSurfaceView(mainActivity: MainActivity, var camera: Camera) : SurfaceView(mainActivity), SurfaceHolder.Callback {
 
     init {
         holder.addCallback(this)
