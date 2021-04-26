@@ -86,7 +86,10 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         if (camera == null) {
             camera = getCameraInstance()
-            cameraSurfaceView.camera = camera!!
+            if (previewEnabled) {
+                cameraSurfaceView.camera = camera!!
+                cameraSurfaceView.startCameraPreview()
+            }
         }
     }
 
@@ -98,10 +101,12 @@ class MainActivity : AppCompatActivity() {
                 previewEnabled = true
                 buttonsView.show()
                 onResultsVisibleChanged(resultsVisible)
+                cameraSurfaceView.camera = camera!!
+                cameraSurfaceView.startCameraPreview()
             }
 
     fun onPreviewFrame(data: ByteArray, camera: Camera) {
-        if (resultsVisible && (processingTask == null || processingTask?.status == AsyncTask.Status.FINISHED)) {
+        if (previewEnabled && resultsVisible && (processingTask == null || processingTask?.status == AsyncTask.Status.FINISHED)) {
             val payload = PreviewPayload(data, camera, viewport.rectangle, getDataRectangle(camera.parameters.previewSize))
             executeProcessingTask(payload)
         }
@@ -201,6 +206,8 @@ class MainActivity : AppCompatActivity() {
                 enableShutterSound(true)
                 parameters = parameters.apply {
                     setPictureSize(previewSize.width, previewSize.height)
+                    setDisplayOrientation(90)
+                    setPreviewCallback { data, camera -> onPreviewFrame(data, camera) }
                     flashMode = FLASH_MODE_OFF
                     focusMode = FOCUS_MODE_CONTINUOUS_PICTURE
                 }

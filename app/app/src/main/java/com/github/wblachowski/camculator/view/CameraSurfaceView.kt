@@ -30,10 +30,8 @@ class CameraSurfaceView(private val mainActivity: MainActivity, var camera: Came
         startCameraPreview()
     }
 
-    private fun startCameraPreview() {
+    fun startCameraPreview() {
         camera.apply {
-            setDisplayOrientation(90)
-            setPreviewCallback(mainActivity::onPreviewFrame)
             setPreviewDisplay(holder)
             startPreview()
         }
