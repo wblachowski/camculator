@@ -107,8 +107,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun onPreviewFrame(data: ByteArray, camera: Camera) {
         if (previewEnabled && resultsVisible && (processingTask == null || processingTask?.status == AsyncTask.Status.FINISHED)) {
-            val payload = PreviewPayload(data, camera, viewport.rectangle, getDataRectangle(camera.parameters.previewSize))
-            executeProcessingTask(payload)
+            PreviewPayload(data, camera, viewport.rectangle, getDataRectangle(camera.parameters.previewSize)).apply(this::executeProcessingTask)
         }
     }
 
@@ -167,8 +166,7 @@ class MainActivity : AppCompatActivity() {
     private fun onCameraCapture(data: ByteArray, camera: Camera) {
         processingTask?.cancel(true)
         this.camera?.stopPreview()
-        val payload = PicturePayload(data, camera, viewport.rectangle, getDataRectangle(camera.parameters.pictureSize))
-        executeProcessingTask(payload)
+        PicturePayload(data, camera, viewport.rectangle, getDataRectangle(camera.parameters.pictureSize)).apply(this::executeProcessingTask)
     }
 
     private fun executeProcessingTask(payload: Payload) {
