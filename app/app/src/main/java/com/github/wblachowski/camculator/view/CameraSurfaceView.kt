@@ -36,7 +36,6 @@ class CameraSurfaceView(private val mainActivity: MainActivity, var camera: Came
             setPreviewCallback(mainActivity::onPreviewFrame)
             setPreviewDisplay(holder)
             startPreview()
-//            autoFocus { _, _ -> }
         }
     }
 
