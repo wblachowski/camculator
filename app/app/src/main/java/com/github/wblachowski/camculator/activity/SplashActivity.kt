@@ -18,6 +18,7 @@ import java.io.FileOutputStream
 
 class SplashActivity : AppCompatActivity() {
 
+    private val permissions = RxPermissions(this)
     private var initialized = false
     private var hasPermission = false
 
@@ -86,16 +87,14 @@ class SplashActivity : AppCompatActivity() {
         EquationInterpreter.init(file)
     }
 
-    private fun askForCameraPermission() {
-        RxPermissions(this)
-                .request(Manifest.permission.CAMERA)
-                .subscribe { granted ->
-                    hasPermission = granted
-                    if (!granted) {
-                        setStatus(R.string.loading_failure)
+    private fun askForCameraPermission() =
+            permissions.request(Manifest.permission.CAMERA)
+                    .subscribe { granted ->
+                        hasPermission = granted
+                        if (!granted) {
+                            setStatus(R.string.loading_failure)
+                        }
                     }
-                }.dispose()
-    }
 
     private fun setStatus(messageReference: Int) = runOnUiThread { statusTextView.text = getString(messageReference) }
 }
