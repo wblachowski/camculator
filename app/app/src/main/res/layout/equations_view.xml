@@ -27,7 +27,6 @@
                 android:id="@+id/equationsMathView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
                 auto:engine="KaTeX" />
         </android.support.v4.widget.NestedScrollView>
     </LinearLayout>
