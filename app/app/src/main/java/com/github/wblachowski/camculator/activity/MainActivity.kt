@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             height = cameraPreviewDim.y
         }
 
-        touchPaneView.setOnTouchListener { view, event -> onTouchPaneClicked(view, event) }
+        touchPaneView.setOnTouchListener { _, event -> onTouchPaneClicked(event) }
         buttonsView.onFlashButtonClicked = this::onFlashButtonClicked
         buttonsView.onPreviewButtonClicked = this::onResultsVisibleChanged
         buttonsView.onCameraButtonClicked = this::onCameraTriggerClicked
@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onTouchPaneClicked(view: View, event: MotionEvent): Boolean {
+    private fun onTouchPaneClicked(event: MotionEvent): Boolean {
         val action = event.action
         val y = event.y
         val draggingMargin = pixelConverter.fromDp(24)
