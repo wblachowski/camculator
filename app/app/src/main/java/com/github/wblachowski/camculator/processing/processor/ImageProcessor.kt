@@ -65,9 +65,6 @@ class ImageProcessor {
 
         //Sort boxes vertically
         boxes.sortBy { it.y }
-//        for (box in boxes) {
-//            rectangle(boxesImg, Point(box.x.toDouble(), box.y.toDouble()), Point((box.x + box.width).toDouble(), (box.y + box.height).toDouble()), Scalar(255.0, 255.0, 255.0, 255.0), 2)
-//        }
         return boxes
     }
 
