@@ -9,7 +9,6 @@ import com.github.wblachowski.camculator.R
 import com.x5.template.Chunk
 import com.x5.template.Theme
 import com.x5.template.providers.AndroidTemplates
-import io.github.kexanie.library.MathView
 
 
 class ScrollableMathView(context: Context?, attrs: AttributeSet? = null) : WebView(context, attrs) {
@@ -42,36 +41,22 @@ class ScrollableMathView(context: Context?, attrs: AttributeSet? = null) : WebVi
     }
 
     private fun getChunk(): Chunk {
-        val TEMPLATE_KATEX = "katex"
-        val TEMPLATE_MATHJAX = "mathjax"
-        var template = TEMPLATE_KATEX
+        val template = if (mEngine == Engine.KATEX) "katex" else "mathjax"
         val loader = AndroidTemplates(context)
-        when (mEngine) {
-            Engine.KATEX -> template = TEMPLATE_KATEX
-            Engine.MATHJAX -> template = TEMPLATE_MATHJAX
-        }
         return Theme(loader).makeChunk(template)
     }
 
     fun setText(text: String?) {
         mText = text
         val chunk = getChunk()
-        val TAG_FORMULA = "formula"
-        val TAG_CONFIG = "config"
-        chunk[TAG_FORMULA] = mText
-        chunk[TAG_CONFIG] = mConfig
+        chunk["formula"] = mText
+        chunk["config"] = mConfig
         loadDataWithBaseURL(null, chunk.toString(), "text/html", "utf-8", "about:blank")
     }
 
     fun getText() = mText
 
-    fun config(config: String?) {
-        if (mEngine == MathView.Engine.MATHJAX) {
-            mConfig = config
-        }
-    }
-
-    fun setEngine(engine: Int) {
+    private fun setEngine(engine: Int) {
         mEngine = when (engine) {
             Engine.KATEX -> Engine.KATEX
             Engine.MATHJAX -> Engine.MATHJAX
