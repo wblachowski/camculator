@@ -30,7 +30,7 @@ private fun addExpBrackets(text: String): String {
         if (char == '^') {
             newText += "^{"
             opened++
-        } else if (opened > 0 && char in terminating) {
+        } else if (char in terminating) {
             while (opened > 0) {
                 newText += "}"
                 opened--
