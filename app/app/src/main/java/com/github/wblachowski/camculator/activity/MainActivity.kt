@@ -150,9 +150,7 @@ class MainActivity : AppCompatActivity() {
     private fun onCameraTriggerClicked() {
         processingTask?.cancel(true)
         hideResults()
-        val onCapture = Camera.PictureCallback { data, camera -> onCameraCapture(data, camera) }
-        val onShutter = Camera.ShutterCallback { onCameraShutter() }
-        camera?.takePicture(onShutter, null, onCapture)
+        camera?.takePicture(Camera.ShutterCallback { onCameraShutter() }, null, Camera.PictureCallback { data, camera -> onCameraCapture(data, camera) })
         buttonsView.hide()
         previewEnabled = false
     }
