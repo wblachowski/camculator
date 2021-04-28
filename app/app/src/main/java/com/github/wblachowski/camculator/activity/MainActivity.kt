@@ -49,9 +49,8 @@ class MainActivity : AppCompatActivity() {
 
         pixelConverter = PixelConverter(resources.displayMetrics)
         camera = getCameraInstance()
-        cameraSurfaceView = CameraSurfaceView(this, camera!!)
+        cameraSurfaceView = CameraSurfaceView(this, camera!!).apply { cameraPreview.addView(this) }
 
-        cameraPreview.addView(cameraSurfaceView)
         cameraPreviewDim = calcCameraPreviewDimensions()
         cameraPreview.layoutParams = cameraPreview.layoutParams.apply {
             width = cameraPreviewDim.x
