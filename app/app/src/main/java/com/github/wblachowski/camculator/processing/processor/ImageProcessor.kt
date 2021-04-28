@@ -10,6 +10,8 @@ import org.opencv.core.CvType.CV_8UC1
 import org.opencv.imgproc.Imgproc.*
 import org.opencv.photo.Photo.fastNlMeansDenoising
 import java.util.*
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.max
 
 class ImageProcessor {
@@ -44,14 +46,10 @@ class ImageProcessor {
         val hierarchy = Mat()
         findContours(binaryImg, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE)
 
-        val boxes = ArrayList<Rect>()
-        for (contour in contours) {
-            boxes.add(boundingRect(contour))
-        }
-
-        //Remove too big boxes
         val maxSize = binaryImg.size().area() * 0.5
-        boxes.removeIf { rect -> rect.size().area() > maxSize }
+
+        //Create boxes filtering out too big ones
+        val boxes = contours.map { boundingRect(it) }.filter { box -> box.size().area() <= maxSize }.sortedBy { it.y }.toMutableList()
 
         //Remove boxes wholly contained in other boxes
         val boxesCopy = ArrayList(boxes)
@@ -63,33 +61,30 @@ class ImageProcessor {
             }
         }
 
-        //Sort boxes vertically
-        boxes.sortBy { it.y }
         return boxes
     }
 
     private fun extractSymbols(binaryImg: Mat, boxes: List<Rect>): List<Symbol> {
         val size = 28
-        val WHITE_SCALAR = Scalar(255.0)
         val symbols = ArrayList<Symbol>()
         for (box in boxes) {
             val symbol = binaryImg.submat(box)
             if (box.height >= box.width) {
-                val newx = size * box.width / box.height
-                if (newx == 0) continue
-                resize(symbol, symbol, Size(newx.toDouble(), size.toDouble()))
-                val rest = size - newx
-                val restLeft = Math.ceil(rest.toDouble() / 2.0).toInt()
-                val restRight = Math.floor(rest.toDouble() / 2.0).toInt()
-                Core.hconcat(Arrays.asList(Mat(size, restLeft, CV_8UC1, WHITE_SCALAR), symbol, Mat(size, restRight, CV_8UC1, WHITE_SCALAR)), symbol)
+                val newX = size * box.width / box.height
+                if (newX == 0) continue
+                resize(symbol, symbol, Size(newX.toDouble(), size.toDouble()))
+                val rest = size - newX
+                val restLeft = ceil(rest.toDouble() / 2.0).toInt()
+                val restRight = floor(rest.toDouble() / 2.0).toInt()
+                Core.hconcat(listOf(Mat(size, restLeft, CV_8UC1, WHITE_SCALAR), symbol, Mat(size, restRight, CV_8UC1, WHITE_SCALAR)), symbol)
             } else {
-                val newy = size * box.height / box.width
-                if (newy == 0) continue
-                resize(symbol, symbol, Size(size.toDouble(), newy.toDouble()))
-                val rest = size - newy
-                val restUp = Math.ceil(rest.toDouble() / 2.0).toInt()
-                val restDown = Math.floor(rest.toDouble() / 2.0).toInt()
-                Core.vconcat(Arrays.asList(Mat(restUp, size, CV_8UC1, WHITE_SCALAR), symbol, Mat(restDown, size, CV_8UC1, WHITE_SCALAR)), symbol)
+                val newY = size * box.height / box.width
+                if (newY == 0) continue
+                resize(symbol, symbol, Size(size.toDouble(), newY.toDouble()))
+                val rest = size - newY
+                val restUp = ceil(rest.toDouble() / 2.0).toInt()
+                val restDown = floor(rest.toDouble() / 2.0).toInt()
+                Core.vconcat(listOf(Mat(restUp, size, CV_8UC1, WHITE_SCALAR), symbol, Mat(restDown, size, CV_8UC1, WHITE_SCALAR)), symbol)
             }
             symbols.add(Symbol(box, symbol))
         }
@@ -98,5 +93,6 @@ class ImageProcessor {
 
     companion object : ArglessSingletonHolder<ImageProcessor>(::ImageProcessor) {
         private const val SCALE_FACTOR = 0.5
+        private val WHITE_SCALAR = Scalar(255.0)
     }
 }
