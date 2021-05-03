@@ -1,3 +1,3 @@
 [submodule "learning/data"]
-	path = learning/data
+	path = training/data
 	url = https://github.com/wblachowski/bhmsds
