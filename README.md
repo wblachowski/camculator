@@ -23,4 +23,4 @@ Android app capable of recognizing and solving math equations based on the camer
 
 ## Demo
 
-![demo](assets/demo.gif)
+<img src="assets/demo.gif" width="45%"/>
