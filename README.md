@@ -9,16 +9,16 @@ Android app capable of recognizing and solving math equations based on the camer
 ## Screenshots
 
 <p float="right">
-  <img src="assets/ss1.jpg" width="40%"/>
-  <img src="assets/ss2.jpg" width="40%"/> 
+  <img src="assets/ss5.jpg" width="40%"/>
+  <img src="assets/ss6.jpg" width="40%"/> 
 </p>
 <p float="right">
   <img src="assets/ss3.jpg" width="40%"/>
   <img src="assets/ss4.jpg" width="40%"/> 
 </p>
 <p float="right">
-  <img src="assets/ss5.jpg" width="40%"/>
-  <img src="assets/ss6.jpg" width="40%"/> 
+  <img src="assets/ss1.jpg" width="40%"/>
+  <img src="assets/ss2.jpg" width="40%"/> 
 </p>
 
 ## Demo
